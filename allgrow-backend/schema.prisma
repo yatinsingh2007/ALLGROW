@@ -1,0 +1,39 @@
+datasource db{
+    url = env("DATABASE_URL")
+    provider = "mysql"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+  id        String              @id @default(uuid())
+  name      String
+  email     String              @unique
+  password  String
+  solvedQuesitions SolvedQuesitions[]  @relation("UserSolved")
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model Questions {
+  id        String              @id @default(uuid())
+  title     String
+  description String
+  solvedBy  SolvedQuesitions[] @relation("QuestionSolved") // users who attempted this question
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model SolvedQuesitions {
+  id          String     @id @default(uuid())
+  userId      String
+  questionId  String
+  createdAt   DateTime   @default(now())
+
+  user        User       @relation("UserSolved", fields: [userId], references: [id])
+  question    Questions  @relation("QuestionSolved", fields: [questionId], references: [id])
+
+  @@unique([userId, questionId])
+}  
