@@ -21,6 +21,7 @@ model Questions {
   id        String              @id @default(uuid())
   title     String
   description String
+  testcases Json
   solvedBy  SolvedQuesitions[] @relation("QuestionSolved") // users who attempted this question
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
