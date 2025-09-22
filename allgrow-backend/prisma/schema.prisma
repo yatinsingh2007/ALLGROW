@@ -1,3 +1,8 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 datasource db{
     url = env("DATABASE_URL")
     provider = "mysql"
@@ -18,13 +23,18 @@ model User {
 }
 
 model Questions {
-  id        String              @id @default(uuid())
-  title     String
+  id          String      @id @default(uuid())
+  title       String
   description String
-  testcases Json
-  solvedBy  SolvedQuesitions[] @relation("QuestionSolved") // users who attempted this question
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
+  input_format String
+  output_format String
+  sample_input String
+  sample_output String
+  test_cases  Json
+  difficulty  String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  solvedQuesitions SolvedQuesitions[]  @relation("QuestionSolved")
 }
 
 model SolvedQuesitions {

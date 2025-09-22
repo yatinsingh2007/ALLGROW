@@ -61,20 +61,7 @@ export default function Dashboard() {
               <Editor
                 height="100%"
                 language={language}
-                defaultValue="// Write your code here"
-                theme="custom-dark"
-                beforeMount={(monaco) => {
-                  monaco.editor.defineTheme("custom-dark", {
-                    base: "vs-dark",
-                    inherit: true,
-                    rules: [],
-                    colors: {
-                      "editor.background": "#00000000",
-                      "editorCursor.foreground": "#FFFFFF",
-                      "editor.selectionBackground": "#44444477",
-                    },
-                  })
-                }}
+                theme="vs-dark"
               />
             </div>
 

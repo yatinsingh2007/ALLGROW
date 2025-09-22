@@ -99,7 +99,7 @@ auth.post('/login' , async (req , res) => {
 
         const token = jwt.sign({
            email : ourUser[0].email
-        } , process.env.JWT_SECRET , { expiresIn : '1h' })
+        } , process.env.JWT_SECRET , { expiresIn : '7d' })
 
         return res.status(200).json({
             message : "Login successful" ,
