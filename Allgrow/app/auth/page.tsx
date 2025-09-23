@@ -11,43 +11,44 @@ export default function ShineBorderDemo() {
   const router = useRouter();
 
   return (
-    <>
-      <div onClick={() => router.push('/')} className="absolute top-5 left-5 p-2 bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition">
-        <MoveLeftIcon className="text-white"/>
-      </div>
-      <GridBeams className="flex items-center justify-center w-full h-screen p-4 flex-col">
-      {/* Tab Switcher */}
-      <div onClick={() => router.push('/')} className="absolute top-5 left-5 p-2 bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition">
-        <MoveLeftIcon className="text-white"/>
-      </div>
-      <div className="flex w-full max-w-[350px] rounded-lg overflow-hidden border border-gray-700 mb-10 ml-8">
-        <button
-          onClick={() => setActiveTab("signup")}
-          className={`flex-1 py-2 text-sm font-bold transition-all duration-300 ${
-            activeTab === "signup"
-              ? "bg-white text-black"
-              : "bg-black text-gray-300 hover:bg-gray-900"
-          }`}
-        >
-          Sign Up
-        </button>
-        <button
-          onClick={() => setActiveTab("login")}
-          className={`flex-1 py-2 text-sm font-bold transition-all duration-300 ${
-            activeTab === "login"
-              ? "bg-white text-black"
-              : "bg-black text-gray-300 hover:bg-gray-900"
-          }`}
-        >
-          Login
-        </button>
+    <GridBeams className="flex items-center justify-center w-full h-screen p-4">
+      {/* Back Button */}
+      <div
+        onClick={() => router.push('/')}
+        className="absolute top-5 left-5 p-2 bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition z-20"
+      >
+        <MoveLeftIcon className="text-white" />
       </div>
 
-      {/* Form Section */}
-      <div className="w-full max-w-md bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-800 flex justify-center">
-        {activeTab === "login" ? <Login /> : <Signup />}
+      {/* Card */}
+      <div className="w-full max-w-md bg-transparent rounded-xl shadow-lg relative flex flex-col h-[600px]">
+        {/* Tabs */}
+        <div className="flex w-full rounded-t-xl overflow-hidden border-b border-gray-700 z-10">
+          <button
+            onClick={() => setActiveTab("signup")}
+            className={`flex-1 py-3 text-sm font-bold transition-all duration-300 ${activeTab === "signup"
+              ? "bg-white text-black"
+              : "bg-black text-gray-300 hover:bg-gray-900"
+              }`}
+          >
+            Sign Up
+          </button>
+          <button
+            onClick={() => setActiveTab("login")}
+            className={`flex-1 py-3 text-sm font-bold transition-all duration-300 ${activeTab === "login"
+              ? "bg-white text-black"
+              : "bg-black text-gray-300 hover:bg-gray-900"
+              }`}
+          >
+            Login
+          </button>
+        </div>
+
+        {/* Form - scrollable */}
+        <div className="p-6 overflow-y-auto flex-1">
+          {activeTab === "login" ? <Login /> : <Signup />}
+        </div>
       </div>
-      </GridBeams>
-    </>
+    </GridBeams>
   );
 }
