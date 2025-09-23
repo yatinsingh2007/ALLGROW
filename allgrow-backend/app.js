@@ -9,19 +9,19 @@ app.use('/auth' , auth )
 
 prisma.questions.create({
   data: {
-  "title": "First N Primes",
-  "description": "Print the first N prime numbers.",
-  "input_format": "Single integer n (number of primes to print)",
-  "output_format": "Print n prime numbers separated by space",
-  "sample_input": "5",
-  "sample_output": "2 3 5 7 11",
-  "test_cases": [
-    { "input": "3", "output": "2 3 5" },
-    { "input": "1", "output": "2" },
-    { "input": "6", "output": "2 3 5 7 11 13" }
-  ],
-  "difficulty": "Easy"
-},
+    "title": "Sum of Squares",
+    "description": "Given an integer n, print the sum of squares of all numbers from 1 to n.",
+    "input_format": "Single integer n",
+    "output_format": "Single integer representing sum of squares",
+    "sample_input": "3",
+    "sample_output": "14",
+    "test_cases": [
+      { "input": "3", "output": "14" },
+      { "input": "5", "output": "55" },
+      { "input": "1", "output": "1" }
+    ],
+    "difficulty": "Easy"
+  },
 }).then(() => {
   console.log("Question created successfully.");
 }).catch((error) => {

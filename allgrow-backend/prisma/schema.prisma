@@ -47,4 +47,4 @@ model SolvedQuesitions {
   question    Questions  @relation("QuestionSolved", fields: [questionId], references: [id])
 
   @@unique([userId, questionId])
-}  
+}
