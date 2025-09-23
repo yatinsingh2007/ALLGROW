@@ -31,11 +31,8 @@ export default function Dashboard() {
         </Panel>
 
         <PanelResizeHandle className="w-1 bg-gray-700" />
-
-        {/* Right Panel (Editor + Console) */}
         <Panel>
           <div className="flex flex-col h-screen bg-[#0f0f0f]">
-            {/* Toolbar */}
             <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-700">
               <select
                 className="bg-[#1e1e1e]/80 text-white px-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -55,8 +52,6 @@ export default function Dashboard() {
                 Run
               </button>
             </div>
-
-            {/* Editor */}
             <div className="flex-1">
               <Editor
                 height="100%"
@@ -64,8 +59,6 @@ export default function Dashboard() {
                 theme="vs-dark"
               />
             </div>
-
-            {/* Input + Output */}
             <div className="h-60 flex flex-col bg-black border-t border-gray-700">
               {/* Input area */}
               <div className="p-3 border-b border-gray-700">
@@ -78,8 +71,6 @@ export default function Dashboard() {
                   rows={3}
                 />
               </div>
-
-              {/* Output console */}
               <div className="flex-1 p-3 text-green-400 font-mono text-sm overflow-auto">
                 <label className="block text-gray-400 mb-1">Output:</label>
                 <pre>{output || "Output will appear here..."}</pre>
