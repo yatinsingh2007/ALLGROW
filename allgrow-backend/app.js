@@ -7,26 +7,46 @@ app.use(express.json());
 
 app.use('/auth' , auth )
 
-prisma.questions.create({
-  data: {
-    "title": "Sum of Squares",
-    "description": "Given an integer n, print the sum of squares of all numbers from 1 to n.",
-    "input_format": "Single integer n",
-    "output_format": "Single integer representing sum of squares",
-    "sample_input": "3",
-    "sample_output": "14",
-    "test_cases": [
-      { "input": "3", "output": "14" },
-      { "input": "5", "output": "55" },
-      { "input": "1", "output": "1" }
-    ],
-    "difficulty": "Easy"
-  },
-}).then(() => {
-  console.log("Question created successfully.");
-}).catch((error) => {
-  console.error("Error creating question:", error);
-});
+app.get('/dashboard' , async (req , res) => {
+  let { offset , limit } = req.query;
+  if (!offset){
+    offset = 0;
+  }
+  if (!limit){
+    limit = 10;
+  }
+  try{
+     const allQuestions = await prisma.questions.findMany({
+        skip : parseInt(offset),
+        take : parseInt(limit)
+     });
+      return res.status(200).json(allQuestions);
+  }catch(err){
+      console.log(err);
+      return res.status(500).json({error : "Internal Server Error"});
+  }
+})
+
+app.get('/question' , async (req , res) => {
+    const { id } = req.query;
+    if (!id){
+        return res.status(400).json({error : "Bad Request"});
+    }
+    try{  
+      const question = await prisma.questions.findUnique({
+        where : {
+            id : id
+        }
+      });
+      if (!question){
+        return res.status(404).json({error : "Question not found"});
+      }
+      return res.status(200).json(question);
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({error : "Internal Server Error"});
+    }
+})
 
 async function main(){
     await prisma.$connect();
