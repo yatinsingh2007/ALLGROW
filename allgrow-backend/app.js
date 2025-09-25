@@ -1,5 +1,7 @@
 require('dotenv').config();
-const { prisma } = require('./prisma/client');
+const { prisma } = require('./prisma/pismaClient');
+
+const { checkUserAuthentication } = require('./middleware/middleware');
 const express = require('express');
 const { auth } = require('./auth/auth');
 const app = express();
@@ -7,7 +9,7 @@ app.use(express.json());
 
 app.use('/auth' , auth )
 
-app.get('/dashboard' , async (req , res) => {
+app.get('/dashboard' , checkUserAuthentication ,  async (req , res) => {
   let { offset , limit } = req.query;
   if (!offset){
     offset = 0;
@@ -27,7 +29,7 @@ app.get('/dashboard' , async (req , res) => {
   }
 })
 
-app.get('/question' , async (req , res) => {
+app.get('/question', checkUserAuthentication , async (req , res) => {
     const { id } = req.query;
     if (!id){
         return res.status(400).json({error : "Bad Request"});
