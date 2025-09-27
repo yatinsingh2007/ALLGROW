@@ -60,12 +60,8 @@ const getAnchorAndDir = (
     case 'bottom-right':
       return { anchor: [w, (1 + outside) * h], dir: [0, -1] };
     default:
-      return { anchor: [0.5 * w, -outside * h], dir: [0, 1] }; // top-center
+      return { anchor: [0.5 * w, -outside * h], dir: [0, 1] };
   }
-};
-
-type Uniforms = {
-  [key: string]: { value: any };
 };
 
 const LightRays: React.FC<LightRaysProps> = ({
@@ -84,17 +80,23 @@ const LightRays: React.FC<LightRaysProps> = ({
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const uniformsRef = useRef<Record<string, { value: number | number[] | [number, number] | [number, number, number] }> | undefined>();
-  const rendererRef = useRef<Renderer>();
-  const meshRef = useRef<Mesh>();
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const smoothMouseRef = useRef({ x: 0.5, y: 0.5 });
-  const animationIdRef = useRef<number>();
-  const cleanupRef = useRef<() => void>();
 
-  // Mouse tracking
+  // Properly typed refs
+  const uniformsRef = useRef<Record<
+  string,
+  { value: number | [number, number] | [number, number, number] | number[] }
+> | null>(null);
+
+const rendererRef = useRef<Renderer | null>(null);
+const meshRef = useRef<Mesh | null>(null);
+
+const mouseRef = useRef({ x: 0.5, y: 0.5 });
+const smoothMouseRef = useRef({ x: 0.5, y: 0.5 });
+const animationIdRef = useRef<number | null>(null);
+const cleanupRef = useRef<(() => void) | null>(null);
+
+  // Mouse movement
   useEffect(() => {
-    if (!followMouse) return;
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -103,20 +105,22 @@ const LightRays: React.FC<LightRaysProps> = ({
         y: (e.clientY - rect.top) / rect.height
       };
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+
+    if (followMouse) {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
   }, [followMouse]);
 
-  // WebGL initialization
+  // WebGL init
   useEffect(() => {
-    if (typeof window === 'undefined' || !containerRef.current) return;
+    if (!containerRef.current) return;
     let isMounted = true;
 
-    const initWebGL = async () => {
+    const initialize = async () => {
       const { Renderer, Program, Triangle, Mesh } = await import('ogl');
       if (!isMounted || !containerRef.current) return;
 
-      // Renderer
       const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
       rendererRef.current = renderer;
       const gl = renderer.gl;
@@ -125,7 +129,6 @@ const LightRays: React.FC<LightRaysProps> = ({
       containerRef.current.innerHTML = '';
       containerRef.current.appendChild(gl.canvas);
 
-      // Shaders
       const vert = `
         attribute vec2 position;
         varying vec2 vUv;
@@ -133,7 +136,9 @@ const LightRays: React.FC<LightRaysProps> = ({
           vUv = position * 0.5 + 0.5;
           gl_Position = vec4(position, 0.0, 1.0);
         }`;
-      const frag = `precision highp float;
+
+      const frag = `
+        precision highp float;
         uniform float iTime;
         uniform vec2 iResolution;
         uniform vec2 rayPos;
@@ -162,11 +167,7 @@ const LightRays: React.FC<LightRaysProps> = ({
           float lengthFalloff = clamp((maxDistance - distance)/maxDistance,0.0,1.0);
           float fadeFalloff = clamp((iResolution.x*fadeDistance-distance)/(iResolution.x*fadeDistance),0.5,1.0);
           float pulse = pulsating>0.5?(0.8+0.2*sin(iTime*speed*3.0)):1.0;
-          float baseStrength = clamp(
-            (0.45 + 0.15*sin(distortedAngle*seedA+iTime*speed)) + 
-            (0.3 + 0.2*cos(-distortedAngle*seedB+iTime*speed)),
-            0.0,1.0
-          );
+          float baseStrength = clamp((0.45 + 0.15*sin(distortedAngle*seedA+iTime*speed)) + (0.3 + 0.2*cos(-distortedAngle*seedB+iTime*speed)),0.0,1.0);
           return baseStrength*lengthFalloff*fadeFalloff*spreadFactor*pulse;
         }
         void mainImage(out vec4 fragColor, in vec2 fragCoord){
@@ -190,8 +191,10 @@ const LightRays: React.FC<LightRaysProps> = ({
         }
         void main(){ vec4 color; mainImage(color, gl_FragCoord.xy); gl_FragColor=color; }`;
 
-      // Uniforms
-      const uniforms: Uniforms = {
+      // uniforms
+      type UniformValue = number | [number, number] | [number, number, number] | number[];
+
+      const uniforms: Record<string, { value: UniformValue }> = {
         iTime: { value: 0 },
         iResolution: { value: [1, 1] },
         rayPos: { value: [0, 0] },
@@ -215,34 +218,27 @@ const LightRays: React.FC<LightRaysProps> = ({
       const mesh = new Mesh(gl, { geometry, program });
       meshRef.current = mesh;
 
-      // Update placement & animation
       const updatePlacement = () => {
-        if (!containerRef.current || !rendererRef.current || !uniformsRef.current) return;
-        const renderer = rendererRef.current;
-        const u = uniformsRef.current;
-        const w = containerRef.current.clientWidth * renderer.dpr;
-        const h = containerRef.current.clientHeight * renderer.dpr;
-        renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-        u.iResolution.value = [w, h];
+        if (!containerRef.current || !rendererRef.current) return;
+        const w = containerRef.current.clientWidth * rendererRef.current.dpr;
+        const h = containerRef.current.clientHeight * rendererRef.current.dpr;
+        rendererRef.current.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+        uniforms.iResolution.value = [w, h];
         const { anchor, dir } = getAnchorAndDir(raysOrigin, w, h);
-        u.rayPos.value = anchor;
-        u.rayDir.value = dir;
+        uniforms.rayPos.value = anchor;
+        uniforms.rayDir.value = dir;
       };
 
       const loop = (t: number) => {
         if (!rendererRef.current || !uniformsRef.current || !meshRef.current) return;
-        const renderer = rendererRef.current;
-        const u = uniformsRef.current;
-        u.iTime.value = t * 0.001;
-
+        uniformsRef.current.iTime.value = t * 0.001;
         if (followMouse && mouseInfluence > 0) {
           const smoothing = 0.92;
           smoothMouseRef.current.x = smoothMouseRef.current.x * smoothing + mouseRef.current.x * (1 - smoothing);
           smoothMouseRef.current.y = smoothMouseRef.current.y * smoothing + mouseRef.current.y * (1 - smoothing);
-          u.mousePos.value = [smoothMouseRef.current.x, smoothMouseRef.current.y];
+          uniformsRef.current.mousePos.value = [smoothMouseRef.current.x, smoothMouseRef.current.y];
         }
-
-        renderer.render({ scene: meshRef.current });
+        rendererRef.current.render({ scene: meshRef.current });
         animationIdRef.current = requestAnimationFrame(loop);
       };
 
@@ -259,13 +255,10 @@ const LightRays: React.FC<LightRaysProps> = ({
           if (ext) ext.loseContext();
           if (canvas?.parentNode) canvas.parentNode.removeChild(canvas);
         }
-        rendererRef.current = undefined;
-        meshRef.current = undefined;
-        uniformsRef.current = undefined;
       };
     };
 
-    initWebGL();
+    initialize();
 
     return () => {
       isMounted = false;
@@ -286,48 +279,7 @@ const LightRays: React.FC<LightRaysProps> = ({
     distortion
   ]);
 
-  // Update uniforms dynamically
-  useEffect(() => {
-    if (!uniformsRef.current || !containerRef.current || !rendererRef.current) return;
-    const u = uniformsRef.current;
-    const renderer = rendererRef.current;
-
-    u.raysColor.value = hexToRgb(raysColor);
-    u.raysSpeed.value = raysSpeed;
-    u.lightSpread.value = lightSpread;
-    u.rayLength.value = rayLength;
-    u.pulsating.value = pulsating ? 1.0 : 0.0;
-    u.fadeDistance.value = fadeDistance;
-    u.saturation.value = saturation;
-    u.mouseInfluence.value = mouseInfluence;
-    u.noiseAmount.value = noiseAmount;
-    u.distortion.value = distortion;
-
-    const w = containerRef.current.clientWidth * renderer.dpr;
-    const h = containerRef.current.clientHeight * renderer.dpr;
-    const { anchor, dir } = getAnchorAndDir(raysOrigin, w, h);
-    u.rayPos.value = anchor;
-    u.rayDir.value = dir;
-  }, [
-    raysColor,
-    raysSpeed,
-    lightSpread,
-    rayLength,
-    pulsating,
-    fadeDistance,
-    saturation,
-    mouseInfluence,
-    noiseAmount,
-    distortion,
-    raysOrigin
-  ]);
-
-  return (
-    <div
-      ref={containerRef}
-      className={`w-full h-full pointer-events-none z-[3] overflow-hidden relative ${className}`.trim()}
-    />
-  );
+  return <div ref={containerRef} className={`w-full h-full relative ${className}`} />;
 };
 
 export default LightRays;
