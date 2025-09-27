@@ -1,39 +1,59 @@
 "use client"
 import React from "react";
-import { BackgroundLines } from "@/components/ui/background-lines";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { useRouter } from "next/navigation";
-import { TypingAnimation } from "@/components/magicui/typing-animation";
 import Navbar from "@/section/Navbar";
+import BlurText from "@/components/BlurText";
+import TextType from "@/components/TextType";
+import LightRays from "@/components/LightRays";
+
 export default function BackgroundLinesDemo() {
   const router = useRouter();
+
   return (
-  <>
-    <Navbar className="top-2 bg-transparent text-white" />
-    <BackgroundLines className="flex items-center justify-center w-full flex-col p-4 bg-black">
-      {/* Hero Section */}
-      <h1 className="bg-clip-text text-center text-gray-200 text-2xl md:text-4xl lg:text-7xl font-sans py-2 md:py-10 relative z-20 font-bold tracking-tight">
-        Welcome To <br /> Allgrow
-      </h1>
-      <p className="max-w-xl mx-auto text-sm md:text-lg text-gray-300 text-center">
-        Build a rock-solid foundation in problem solving and logic before stepping into the world of Data Structures and Algorithms.
-      </p>
-      <TypingAnimation className="text-white">
-        Exclusively in Python
-      </TypingAnimation>
-      <InteractiveHoverButton
-        className="mt-6 cursor-pointer"
-        onClick={(e) => {
-          e.preventDefault();
-          router.push("/auth");
-        }}
-      >
-       Start Coding
-      </InteractiveHoverButton>
-    </BackgroundLines>
-    <footer className="w-full bg-transparent text-gray-400 text-center py-4 text-sm absolute bottom-0 left-0 right-0">
-        &copy; {new Date().getFullYear()} Allgrow. All rights reserved.
-    </footer>
-  </>
+    <>
+      <div className="absolute inset-0 -z-10">
+          <LightRays />
+      </div>
+
+      {/* Content */}
+      <div className="relative flex flex-col min-h-screen items-center justify-between px-6 py-8">
+        <Navbar className="top-2 bg-blend-darken text-white" />
+
+        <main className="flex flex-col items-center justify-center flex-1 text-center">
+          <BlurText
+            text="Welcome to Allgrow"
+            delay={150}
+            animateBy="words"
+            direction="top"
+            className="text-5xl md:text-7xl font-bold mb-6 text-white"
+          />
+
+          <TextType
+            text={`Build a rock-solid foundation in problem solving and logic before stepping into 
+              the world of Data Structures and Algorithms.`}
+            typingSpeed={30}
+            pauseDuration={1500}
+            showCursor={true}
+            cursorCharacter="|"
+            className="max-w-3xl text-white text-lg md:text-xl font-medium leading-relaxed p-10"
+          />
+
+          <InteractiveHoverButton
+            className="mt-20 px-6 py-2 text-lg cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              router.push("/auth");
+            }}
+          >
+            Start Coding
+          </InteractiveHoverButton>
+        </main>
+
+        <footer className="w-full text-gray-400 text-center py-4 text-sm">
+          &copy; {new Date().getFullYear()} Allgrow. All rights reserved.
+        </footer>
+      </div>
+    </>
   );
 }

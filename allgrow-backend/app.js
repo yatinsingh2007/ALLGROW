@@ -7,9 +7,9 @@ const { auth } = require('./auth/auth');
 const app = express();
 app.use(express.json());
 
-app.use('/auth' , auth )
+app.use('/api/auth' , auth )
 
-app.get('/dashboard' , checkUserAuthentication ,  async (req , res) => {
+app.get('/api/dashboard' , checkUserAuthentication ,  async (req , res) => {
   let { offset , limit } = req.query;
   if (!offset){
     offset = 0;
