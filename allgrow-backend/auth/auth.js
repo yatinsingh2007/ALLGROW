@@ -1,16 +1,18 @@
 const express = require('express');
 
-const { validator } = require('validator')
+const  validator = require('validator')
 
 const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken')
 
-const { prisma } = require('../prisma/pismaClient');
+const { prisma } = require('../prisma/prismaClient');
 
 require('dotenv').config();
 
 const auth = express.Router();
+
+auth.use(express.json());
 
 auth.post('/register' , async (req , res) => {
     let { name , email , password } = req.body;
@@ -22,12 +24,14 @@ auth.post('/register' , async (req , res) => {
     }
 
     name = name.trim();
-
+    email = email.trim();
+    password = password.trim();
     if (name.length < 3){
         return res.status(400).json(
             { error: "Name must be at least 3 characters long" }
         );
     }
+
 
     if (!validator.isEmail(email)) {
         return res.status(400).json(

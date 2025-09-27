@@ -17,7 +17,7 @@ model User {
   name      String
   email     String              @unique
   password  String
-  solvedQuesitions SolvedQuesitions[]  @relation("UserSolved")
+  solvedQuestions SolvedQuestions[]  @relation("UserSolved")
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
 }
@@ -34,10 +34,10 @@ model Questions {
   difficulty  String
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  solvedQuesitions SolvedQuesitions[]  @relation("QuestionSolved")
+  solvedQuestions SolvedQuestions[]  @relation("QuestionSolved")
 }
 
-model SolvedQuesitions {
+model SolvedQuestions {
   id          String     @id @default(uuid())
   userId      String
   questionId  String
