@@ -24,7 +24,7 @@ export default function SignupCard() {
       return toast.error("Passwords do not match")
     }
     try{
-      await api.post("/register" , {
+      await api.post("/auth/register" , {
         name : userDetails.name ,
         email : userDetails.email ,
         password : userDetails.password

@@ -5,19 +5,15 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/section/Navbar";
 import BlurText from "@/components/BlurText";
 import TextType from "@/components/TextType";
-import LightRays from "@/components/LightRays";
+import { BackgroundLines } from "@/components/ui/background-lines";
 
 export default function BackgroundLinesDemo() {
   const router = useRouter();
 
   return (
     <>
-      <div className="absolute inset-0 -z-10">
-          <LightRays />
-      </div>
-
-      {/* Content */}
-      <div className="relative flex flex-col min-h-screen items-center justify-between px-6 py-8">
+      <BackgroundLines className="bg-black">
+        <div className="relative flex flex-col min-h-screen items-center justify-between px-6 py-8">
         <Navbar className="top-2 bg-blend-darken text-white" />
 
         <main className="flex flex-col items-center justify-center flex-1 text-center">
@@ -54,6 +50,7 @@ export default function BackgroundLinesDemo() {
           &copy; {new Date().getFullYear()} Allgrow. All rights reserved.
         </footer>
       </div>
+      </BackgroundLines>
     </>
   );
 }

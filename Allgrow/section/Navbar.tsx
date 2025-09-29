@@ -13,7 +13,7 @@ export default function Navbar({ className }: { className?: string }) {
       <Menu setActive={setActive}>
         <MenuItem setActive={setActive} active={active} item="Home" />
         <MenuItem setActive={setActive} active={active} item="Learn">
-          <div className="text-sm grid gap-3 p-4 text-white">
+          <div className="text-sm grid gap-3 p-4 text-black bg-white rounded-2xl">
             <a href="/learn/roadmap" className="hover:text-blue-400">
               Beginner Roadmap — step-by-step coding journey
             </a>
@@ -26,7 +26,7 @@ export default function Navbar({ className }: { className?: string }) {
           </div>
         </MenuItem>
         <MenuItem setActive={setActive} active={active} item="Resources">
-          <div className="text-sm grid gap-3 p-4 text-white">
+          <div className="text-sm grid gap-3 p-4 text-black bg-white rounded-2xl">
             <a href="/blog" className="hover:text-blue-400">
               Blog — insights & tips on coding and careers
             </a>
@@ -36,7 +36,7 @@ export default function Navbar({ className }: { className?: string }) {
           </div>
         </MenuItem>
         <MenuItem setActive={setActive} active={active} item="About">
-          <div className="p-4 text-sm text-white">
+          <div className="p-4 text-sm text-black bg-white rounded-2xl">
             <p>
               Allgrow is a mentorship-driven platform helping students 
               master algorithms, problem-solving, and placement skills.

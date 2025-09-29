@@ -14,26 +14,32 @@ import { ShineBorder } from "@/components/magicui/shine-border";
 import { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation"
 interface Credentials {
     name : string ,
   email: string;
   password: string;
 }
 export default function Login() {
+    const router = useRouter();
     const [details , setDetails] = useState<Credentials>({name : "" , email: "", password: ""});
     const handleLogin = async (e : React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         toast.loading("Loading...")
         try{
-            const res = await api.post("/login" , {
+            const res = await api.post("/auth/login" , {
                 email : details.email ,
                 password : details.password
             })
-            localStorage.setItem("allgrow_token" , res.data.token)
+            localStorage.setItem("token" , res.data.token)
             toast.success("Logged in successfully")
+            router.push("/dashboard")
+            toast.dismiss()
+            return
         }catch(err){
             toast.error("Something went wrong");
             console.log(err);
+            return
         }
     }
     return (
