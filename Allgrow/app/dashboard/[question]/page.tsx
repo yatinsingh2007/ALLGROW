@@ -6,13 +6,12 @@ import { useState } from "react"
 import { Meteors } from "@/components/ui/meteors"
 
 export default function Dashboard() {
-  const [language, setLanguage] = useState("python")
-  const [output, setOutput] = useState("") // store execution result
-  const [customInput, setCustomInput] = useState("") // 👈 store stdin input
+  const [language, setLanguage] = useState<string>("python")
+  const [output, setOutput] = useState<string>("")
+  const [customInput, setCustomInput] = useState<string>("")
   const { question } = useParams()
 
   const handleRun = () => {
-    // fake run logic for now
     setOutput(
       `Running ${language} code...\nInput:\n${customInput || "(no input)"}\n\nOutput:\nHello World!`
     )
@@ -22,7 +21,6 @@ export default function Dashboard() {
     <>
       <Meteors />
       <PanelGroup direction="horizontal">
-        {/* Left Panel (Question) */}
         <Panel>
           <div className="p-4 text-white">
             <h1 className="text-2xl font-bold mb-2">{question}</h1>
@@ -60,7 +58,6 @@ export default function Dashboard() {
               />
             </div>
             <div className="h-60 flex flex-col bg-black border-t border-gray-700">
-              {/* Input area */}
               <div className="p-3 border-b border-gray-700">
                 <label className="block text-gray-400 mb-1">Custom Input:</label>
                 <textarea

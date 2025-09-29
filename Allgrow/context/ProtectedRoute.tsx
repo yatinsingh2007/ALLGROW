@@ -1,26 +1,18 @@
 "use client";
-import { createContext, ReactNode, useState } from 'react';
+import { createContext , useState } from 'react';
 
 interface ProtectRouteContextType {
   isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
+  setIsAuthenticated : React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ProtectRouteContext = createContext<ProtectRouteContextType | null>(null);
 
-interface ProtectedRouteProviderProps {
-  children: ReactNode;
-}
-
-const ProtectedRouteProvider = ({ children }: ProtectedRouteProviderProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
+const ProtectedRouteProvider = ({ children }: { children : React.ReactNode}) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   return (
-    <ProtectRouteContext.Provider value={{ isAuthenticated, login, logout }}>
+    <ProtectRouteContext.Provider value={{isAuthenticated , setIsAuthenticated}}>
       {children}
     </ProtectRouteContext.Provider>
   );

@@ -6,21 +6,20 @@ import { MoveLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { GridBeams } from "@/components/ui/grid-beams";
 
-export default function ShineBorderDemo() {
-  const [activeTab, setActiveTab] = useState("signup");
+
+
+export default function ShineBorderDemo(): React.ReactNode {
+  const [activeTab, setActiveTab] = useState<string>("signup");
   const router = useRouter();
 
   return (
     <GridBeams className="flex items-center justify-center w-full h-screen p-4">
-      {/* Back Button */}
       <div
         onClick={() => router.push('/')}
         className="absolute top-5 left-5 p-2 bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition z-20"
       >
         <MoveLeftIcon className="text-white" />
       </div>
-
-      {/* Card */}
       <div className="w-full max-w-md bg-transparent rounded-xl shadow-lg relative flex flex-col h-[600px]">
         {/* Tabs */}
         <div className="flex w-full rounded-t-xl overflow-hidden border-b border-gray-700 z-10">
@@ -43,8 +42,6 @@ export default function ShineBorderDemo() {
             Login
           </button>
         </div>
-
-        {/* Form - scrollable */}
         <div className="p-6 overflow-y-auto flex-1">
           {activeTab === "login" ? <Login /> : <Signup />}
         </div>
