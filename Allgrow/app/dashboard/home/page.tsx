@@ -28,6 +28,7 @@ interface Question {
   createdAt: Date;
   updatedAt: Date;
 }
+import { useRouter } from "next/navigation";
 
 export default function SidebarDemo() {
   const [data, setData] = useState<Question[]>([]);
@@ -149,6 +150,7 @@ const getDifficultyColor = (difficulty: string) => {
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
+  const router = useRouter();
   return (
     <div className="flex flex-1">
       <div className="grid h-full w-full flex-1 grid-cols-1 gap-4 rounded-tl-2xl border border-neutral-200 bg-white p-4 md:grid-cols-2 lg:grid-cols-3 md:p-8 dark:border-neutral-700 dark:bg-neutral-900">
@@ -158,7 +160,11 @@ const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
           data.map((q) => (
             <div
               key={q.id}
-              className="flex flex-col justify-between rounded-2xl border border-neutral-200 bg-gray-50 p-5 shadow hover:shadow-md transition dark:border-neutral-700 dark:bg-neutral-800"
+              className="flex flex-col justify-between rounded-2xl border border-neutral-200 bg-gray-50 p-5 shadow hover:shadow-md transition dark:border-neutral-700 dark:bg-neutral-800 cursor-pointer"
+              onClick={(e : React.MouseEvent) => {
+                e.preventDefault();
+                router.push(`/dashboard/${q.id}`)
+              }}
             >
               <div>
                 <h2 className="mb-2 text-lg font-semibold text-black dark:text-white">

@@ -33,7 +33,7 @@ export default function Login() {
             })
             localStorage.setItem("token" , res.data.token)
             toast.success("Logged in successfully")
-            router.push("/dashboard")
+            router.push("/dashboard/home")
             toast.dismiss()
             return
         }catch(err){
