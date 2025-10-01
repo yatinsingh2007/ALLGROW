@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { Logo , LogoIcon } from '@/components/Logo'
+import { Logo, LogoIcon } from "@/components/Logo";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -11,6 +11,9 @@ import {
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import ProtectRouteProvider from "@/context/ProtectedRoute";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface testCases {
   sample_input: [string];
@@ -28,8 +31,6 @@ interface Question {
   createdAt: Date;
   updatedAt: Date;
 }
-import { useRouter } from "next/navigation";
-import ProtectRouteProvider from "@/context/ProtectedRoute";
 
 export default function SidebarDemo() {
   const [data, setData] = useState<Question[]>([]);
@@ -86,50 +87,52 @@ export default function SidebarDemo() {
 
   return (
     <ProtectRouteProvider>
-    <div
-      className={cn(
-        "mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 bg-gray-100 md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
-        "h-screen"
-      )}
-    >
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
-            {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2">
-              {loading
-                ? Array.from({ length: 4 }).map((_, idx) => (
-                    <SidebarShimmer key={idx} />
-                  ))
-                : links.map((link, idx) => <SidebarLink key={idx} link={link} />)}
+      <div
+        className={cn(
+          "mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-md border border-neutral-200 bg-gray-100 md:flex-row dark:border-neutral-700 dark:bg-neutral-800",
+          "h-screen"
+        )}
+      >
+        <Sidebar open={open} setOpen={setOpen}>
+          <SidebarBody className="justify-between gap-10">
+            <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+              {open ? <Logo /> : <LogoIcon />}
+              <div className="mt-8 flex flex-col gap-2">
+                {loading
+                  ? Array.from({ length: 4 }).map((_, idx) => (
+                      <SidebarShimmer key={idx} />
+                    ))
+                  : links.map((link, idx) => (
+                      <SidebarLink key={idx} link={link} />
+                    ))}
+              </div>
             </div>
-          </div>
-        </SidebarBody>
-      </Sidebar>
-      <Dashboard data={data} loading={loading} />
-    </div>
+          </SidebarBody>
+        </Sidebar>
+        <Dashboard data={data} loading={loading} />
+      </div>
     </ProtectRouteProvider>
   );
 }
 
-
+// ✅ Refactored shimmer loaders using Skeleton
 const SidebarShimmer = () => (
-  <div className="flex items-center space-x-2 px-2 py-2 rounded-lg animate-pulse">
-    <div className="h-5 w-5 bg-gray-300 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded" />
+  <div className="flex items-center space-x-2 px-2 py-2 rounded-lg">
+    <Skeleton className="h-5 w-5 rounded" />
+    <Skeleton className="h-4 w-20 rounded" />
   </div>
 );
 
 const ShimmerCard = () => (
-  <div className="flex flex-col justify-between rounded-2xl border border-neutral-200 bg-gray-50 p-5 shadow dark:border-neutral-700 dark:bg-neutral-800 animate-pulse">
+  <div className="flex flex-col justify-between rounded-2xl border border-neutral-200 bg-gray-50 p-5 shadow dark:border-neutral-700 dark:bg-neutral-800">
     <div>
-      <div className="h-5 w-3/4 bg-gray-300 dark:bg-gray-700 rounded mb-2" />
-      <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-600 rounded mb-1" />
-      <div className="h-4 w-1/3 bg-gray-200 dark:bg-gray-600 rounded" />
+      <Skeleton className="h-5 w-3/4 mb-2 rounded" />
+      <Skeleton className="h-4 w-1/2 mb-1 rounded" />
+      <Skeleton className="h-4 w-1/3 rounded" />
     </div>
     <div className="mt-3 flex items-center justify-between">
-      <div className="h-5 w-16 bg-gray-300 dark:bg-gray-700 rounded-full" />
-      <div className="h-4 w-12 bg-gray-200 dark:bg-gray-600 rounded" />
+      <Skeleton className="h-5 w-16 rounded-full" />
+      <Skeleton className="h-4 w-12 rounded" />
     </div>
   </div>
 );
@@ -164,9 +167,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
             <div
               key={q.id}
               className="flex flex-col justify-between rounded-2xl border border-neutral-200 bg-gray-50 p-5 shadow hover:shadow-md transition dark:border-neutral-700 dark:bg-neutral-800 cursor-pointer"
-              onClick={(e : React.MouseEvent) => {
+              onClick={(e: React.MouseEvent) => {
                 e.preventDefault();
-                router.push(`/dashboard/${q.id}`)
+                router.push(`/dashboard/${q.id}`);
               }}
             >
               <div>
@@ -203,6 +206,3 @@ const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
     </div>
   );
 };
-
-
-
