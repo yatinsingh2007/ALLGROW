@@ -4,6 +4,7 @@ import { useParams } from "next/navigation"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 import { useState } from "react"
 import { Meteors } from "@/components/ui/meteors"
+import  ProtectRouteProvider  from "@/context/ProtectedRoute"
 
 export default function Dashboard() {
   const [language, setLanguage] = useState<string>("python")
@@ -19,6 +20,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <ProtectRouteProvider>
       <Meteors />
       <PanelGroup direction="horizontal">
         <Panel>
@@ -76,6 +78,7 @@ export default function Dashboard() {
           </div>
         </Panel>
       </PanelGroup>
+      </ProtectRouteProvider>
     </>
   )
 }
