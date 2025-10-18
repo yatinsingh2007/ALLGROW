@@ -105,16 +105,19 @@ export default function SidebarDemo() {
                     ))
                   : links.map((link, idx) => {
                       if (link.label === "Logout") {
-                        return (<SidebarLink
+                        return (
+                          <div
                           key={idx}
-                          link={link}
-                          onClick={(e: React.MouseEvent) => {
+                          onClick={(e) => {
                             e.preventDefault();
                             localStorage.removeItem("token");
+                            toast.success("Logged out successfully!");
                             router.push("/");
                           }}
-                        />
-                      );
+                        >
+                          <SidebarLink link={link} key={idx} />
+                        </div>
+                        );
                       }
                       return <SidebarLink key={idx} link={link} />
                   })}
