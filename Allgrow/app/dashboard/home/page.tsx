@@ -14,7 +14,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import ProtectRouteProvider from "@/context/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Pagination, PaginationItem, PaginationCursor } from "@heroui/pagination";
+import  DashboardPagination  from "@/section/Pagination";
 interface testCases {
   sample_input: string[];
   sample_output: string[];
@@ -54,6 +54,7 @@ export default function SidebarDemo() {
       }
     })();
   }, []);
+
 
   const links = [
     {
@@ -138,7 +139,6 @@ const SidebarShimmer = () => (
   </div>
 );
 
-/* 🔹 Card shimmer loader (dark mode friendly) */
 const ShimmerCard = () => (
   <div className="flex flex-col justify-between rounded-2xl border border-neutral-800 bg-neutral-900 p-5 shadow animate-pulse">
     <div>
@@ -172,6 +172,10 @@ const getDifficultyColor = (difficulty: string) => {
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
+  const [ page , setPage ] = useState<number>(0);
+  useEffect(() => {
+
+  } , [page])
   const router = useRouter();
   return (
     <div className="flex flex-1">
@@ -211,7 +215,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
             </div>
           ))
         )}
-        <Pagination initialPage={1} total = {7} size="md" variant="light" showControls/>
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 ">
+              <DashboardPagination totalPages={10} currentPage={page} onPageChange={setPage}/>
+      </div>
       </div>
     </div>
   );
