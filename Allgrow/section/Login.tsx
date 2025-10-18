@@ -14,7 +14,7 @@ import { ShineBorder } from "@/components/magicui/shine-border";
 import { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 interface Credentials {
     name : string ,
   email: string;
@@ -25,7 +25,8 @@ export default function Login() {
     const [details , setDetails] = useState<Credentials>({name : "" , email: "", password: ""});
     const handleLogin = async (e : React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        toast.loading("Loading...")
+        toast.loading("Loading...");
+        router.push("/dashboard/home");
         try{
             const res = await api.post("/auth/login" , {
                 email : details.email ,
@@ -56,17 +57,15 @@ export default function Login() {
             <div className="grid gap-4">
                 <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="name@example.com" onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
-                    e.preventDefault();
+                <Input id="email" type="email" placeholder="name@example.com" onChange={(e : React.ChangeEvent<HTMLInputElement>) => 
                     setDetails({...details , email : e.target.value})
-                }}/>
+                }/>
                 </div>
                 <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="*********" onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
-                    e.preventDefault();
+                <Input id="password" type="password" placeholder="*********" onChange={(e : React.ChangeEvent<HTMLInputElement>) => 
                     setDetails({...details , password : e.target.value})
-                }}/>
+                }/>
                 </div>
             </div>
             </form>

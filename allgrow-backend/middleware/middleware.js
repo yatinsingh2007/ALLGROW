@@ -19,7 +19,7 @@ const checkUserAuthentication = async (req , res , next) => {
 
         const ourUser = await prisma.user.findMany({
             where : {
-                email : decoded.email
+                id : decoded.id
             }
         })
 

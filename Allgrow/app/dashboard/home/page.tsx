@@ -14,10 +14,10 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import ProtectRouteProvider from "@/context/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { Pagination, PaginationItem, PaginationCursor } from "@heroui/pagination";
 interface testCases {
-  sample_input: [string];
-  sample_output: [string];
+  sample_input: string[];
+  sample_output: string[];
 }
 interface Question {
   id: string;
@@ -36,6 +36,7 @@ export default function SidebarDemo() {
   const [data, setData] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -93,7 +94,6 @@ export default function SidebarDemo() {
           "h-screen"
         )}
       >
-        {/* Sidebar */}
         <Sidebar open={open} setOpen={setOpen}>
           <SidebarBody className="justify-between gap-10">
             <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
@@ -103,22 +103,31 @@ export default function SidebarDemo() {
                   ? Array.from({ length: 4 }).map((_, idx) => (
                       <SidebarShimmer key={idx} />
                     ))
-                  : links.map((link, idx) => (
-                      <SidebarLink key={idx} link={link} />
-                    ))}
+                  : links.map((link, idx) => {
+                      if (link.label === "Logout") {
+                        return (<SidebarLink
+                          key={idx}
+                          link={link}
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            localStorage.removeItem("token");
+                            router.push("/");
+                          }}
+                        />
+                      );
+                      }
+                      return <SidebarLink key={idx} link={link} />
+                  })}
               </div>
             </div>
           </SidebarBody>
         </Sidebar>
-
-        {/* Dashboard */}
         <Dashboard data={data} loading={loading} />
       </div>
     </ProtectRouteProvider>
   );
 }
 
-/* 🔹 Sidebar shimmer loader */
 const SidebarShimmer = () => (
   <div className="flex items-center space-x-2 px-2 py-2 rounded-lg">
     <Skeleton className="h-5 w-5 rounded bg-neutral-800" />
@@ -159,14 +168,12 @@ const getDifficultyColor = (difficulty: string) => {
   }
 };
 
-/* 🔹 Dashboard with infinite shimmer if no questions */
 const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
   const router = useRouter();
   return (
     <div className="flex flex-1">
       <div className="grid h-full w-full flex-1 grid-cols-1 gap-4 rounded-tl-2xl border border-neutral-800 bg-neutral-950 p-4 md:grid-cols-2 lg:grid-cols-3 md:p-8">
         {loading || data.length === 0 ? (
-          // 🔥 Infinite shimmer when loading OR no data
           Array.from({ length: 9 }).map((_, idx) => <ShimmerCard key={idx} />)
         ) : (
           data.map((q) => (
@@ -201,6 +208,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
             </div>
           ))
         )}
+        <Pagination initialPage={1} total = {7} size="md" variant="light" showControls/>
       </div>
     </div>
   );

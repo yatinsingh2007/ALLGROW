@@ -13,7 +13,7 @@ dashboard.get('' , checkUserAuthentication ,  async (req , res) => {
     offset = 0;
   }
   if (!limit){
-    limit = 10;
+    limit = 9;
   }
   try{
      const allQuestions = await prisma.questions.findMany({

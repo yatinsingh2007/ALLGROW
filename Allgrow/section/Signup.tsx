@@ -7,7 +7,6 @@ import { ShineBorder } from "@/components/magicui/shine-border"
 import React, { useState } from "react"
 import api from "@/lib/axios"
 import toast from "react-hot-toast"
-import { useRouter } from "next/navigation"
 interface User{
   name : string ,
   email : string ,
@@ -16,7 +15,6 @@ interface User{
 }
 
 export default function SignupCard() {
-  const router = useRouter();
   const [userDetails , setUserDetails] = useState<User>({name : "" , email : "" , password : "" , confirmPassword : ""})
   const handleSignup = async (e : React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -28,9 +26,8 @@ export default function SignupCard() {
         name : userDetails.name ,
         email : userDetails.email ,
         password : userDetails.password
-      })
-      toast.success("Account created successfully !! , Now Please Login")
-      router.push("/login")
+      });
+      toast.success("Account created successfully !! , Now Please Login");
     }catch(err){
       console.log(err);
       return toast.error("Something went wrong")
@@ -52,34 +49,22 @@ export default function SignupCard() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="fullname">Full Name</Label>
-              <Input id="fullname" type="text" placeholder="John Doe" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
-                e.preventDefault();
-                setUserDetails({...userDetails , name : e.target.value})
-              }}/>
+              <Input id="fullname" type="text" placeholder="John Doe" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , name : e.target.value}) }/>
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="name@example.com" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
-                e.preventDefault();
-                setUserDetails({...userDetails , email : e.target.value})
-              }}/>
+              <Input id="email" type="email" placeholder="name@example.com" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , email : e.target.value}) }/>
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
-                e.preventDefault();
-                setUserDetails({...userDetails , password : e.target.value})
-              }}/>
+              <Input id="password" type="password" placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , password : e.target.value }) }/>
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input id="confirm-password" type="password" placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
-                e.preventDefault();
-                setUserDetails({...userDetails , confirmPassword : e.target.value})
-              }}/>
+              <Input id="confirm-password" type="password" placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , confirmPassword : e.target.value}) }/>
             </div>
           </div>
         </form>
