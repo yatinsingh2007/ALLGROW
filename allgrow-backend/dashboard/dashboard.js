@@ -8,17 +8,14 @@ const { checkUserAuthentication } = require('../middleware/middleware')
 
 
 dashboard.get('/home' , checkUserAuthentication ,  async (req , res) => {
-  let { offset , limit } = req.query;
+  let { offset } = req.query;
   if (!offset){
     offset = 0;
-  }
-  if (!limit){
-    limit = 9;
   }
   try{
      const allQuestions = await prisma.questions.findMany({
         skip : parseInt(offset),
-        take : parseInt(limit)
+        take : 9
      });
       return res.status(200).json(allQuestions);
   }catch(err){

@@ -72,13 +72,6 @@ export default function SidebarDemo() {
       ),
     },
     {
-      label: "Settings",
-      href: "#",
-      icon: (
-        <IconSettings className="h-5 w-5 shrink-0 text-neutral-300" />
-      ),
-    },
-    {
       label: "Logout",
       href: "#",
       icon: (
@@ -126,7 +119,7 @@ export default function SidebarDemo() {
             </div>
           </SidebarBody>
         </Sidebar>
-        <Dashboard data={data} loading={loading} />
+        <Dashboard data={data} loading={loading} setData={setData} />
       </div>
     </ProtectRouteProvider>
   );
@@ -156,6 +149,7 @@ const ShimmerCard = () => (
 interface DashboardProps {
   data: Question[];
   loading: boolean;
+  setData: React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
 const getDifficultyColor = (difficulty: string) => {
@@ -171,10 +165,21 @@ const getDifficultyColor = (difficulty: string) => {
   }
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
+const Dashboard: React.FC<DashboardProps> = ({ data, loading , setData }) => {
   const [ page , setPage ] = useState<number>(0);
   useEffect(() => {
-
+    (async () => {
+      try{
+        const token: string | null = localStorage.getItem("token");
+        const resp = await api.get(`/dashboard/home?offset=${page * 9}` , {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setData(resp.data);
+      }catch(err){
+        console.log(err);
+        throw err;
+      }
+    })();
   } , [page])
   const router = useRouter();
   return (
