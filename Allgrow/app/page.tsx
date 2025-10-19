@@ -18,7 +18,7 @@ export default function BackgroundLinesDemo() {
 
         <main className="flex flex-col items-center justify-center flex-1 text-center">
           <BlurText
-            text="Welcome to Allgrow"
+            text="Welcome to VintiCode"
             delay={150}
             animateBy="words"
             direction="top"
@@ -47,7 +47,7 @@ export default function BackgroundLinesDemo() {
         </main>
 
         <footer className="w-full text-gray-400 text-center py-4 text-sm">
-          &copy; {new Date().getFullYear()} Allgrow. All rights reserved.
+          &copy; {new Date().getFullYear()} VintiCode. All rights reserved.
         </footer>
       </div>
       </BackgroundLines>

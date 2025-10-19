@@ -25,6 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <title>Allgrow — Practice DSA from Basics to Mastery</title>
+        <meta name="description" content="Allgrow helps you learn and practice DSA step-by-step, from Hello World to advanced problems. Perfect for beginners in coding."/>
         <meta name="google-site-verification" content="L63uGSjv-ig202O9O7OB6XKbgHRQHhHyiKmkxhoJjNw" />
       </head>
       <body
