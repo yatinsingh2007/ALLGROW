@@ -7,7 +7,7 @@ const dashboard = express.Router()
 const { checkUserAuthentication } = require('../middleware/middleware')
 
 
-dashboard.get('' , checkUserAuthentication ,  async (req , res) => {
+dashboard.get('/home' , checkUserAuthentication ,  async (req , res) => {
   let { offset , limit } = req.query;
   if (!offset){
     offset = 0;
@@ -29,6 +29,7 @@ dashboard.get('' , checkUserAuthentication ,  async (req , res) => {
 
 dashboard.get('/question/:id', checkUserAuthentication , async (req , res) => {
     const { id } = req.params;
+    console.log(id);
     if (!id){
         return res.status(400).json({error : "Bad Request"});
     }

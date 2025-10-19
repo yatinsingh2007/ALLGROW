@@ -13,25 +13,22 @@ const checkUserAuthentication = async (req , res , next) => {
     }
 
     const token = authorization.split(' ')[1];
-
     try {
         const decoded = jwt.verify(token , process.env.JWT_SECRET);
-
-        const ourUser = await prisma.user.findMany({
+        const ourUser = await prisma.user.findUnique({
             where : {
                 id : decoded.id
             }
-        })
-
-        if (ourUser.length === 0){
+        });
+        if (!ourUser){
             return res.status(404).json(
                 { error: "User not found" }
             );
         }
-
-        req.user = ourUser[0];
+        req.user = ourUser;
         next();
     }catch(err){
+        console.log(err);
         return res.status(500).json(
             { error: "Internal Server Error" }
         )

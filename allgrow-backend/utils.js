@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-axios.create({
+const api = axios.create({
     host : "https://judge0-ce.p.rapidapi.com"
 })
 
-module.exports = { axios }
+module.exports = { api }

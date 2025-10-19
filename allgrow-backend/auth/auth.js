@@ -83,18 +83,18 @@ auth.post('/login' , async (req , res) => {
     }
 
     try {
-        const ourUser = await prisma.user.findMany({
+        const ourUser = await prisma.user.findUnique({
             where : {
                 email
             }
         })
-        if (ourUser.length === 0){
+        if (!ourUser){
             return res.status(404).json(
                 { error: "User not found" }
             );
         }
 
-        const compare = await bcrypt.compare(password , ourUser[0].password)
+        const compare = await bcrypt.compare(password , ourUser.password)
         if (!compare){
             return res.status(401).json(
                 { error: "Invalid credentials" }
@@ -102,7 +102,7 @@ auth.post('/login' , async (req , res) => {
         }
 
         const token = jwt.sign({
-            id : ourUser[0].id ,
+            id : ourUser.id ,
         } , process.env.JWT_SECRET , { expiresIn : '7d' })
 
         return res.status(200).json({

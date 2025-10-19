@@ -42,7 +42,7 @@ export default function SidebarDemo() {
     (async () => {
       try {
         const token: string | null = localStorage.getItem("token");
-        const resp = await api.get(`/dashboard`, {
+        const resp = await api.get(`/dashboard/home`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setData(resp.data);
@@ -189,7 +189,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data, loading }) => {
               className="flex flex-col justify-between rounded-2xl border border-neutral-800 bg-neutral-900 p-5 shadow hover:shadow-md transition cursor-pointer"
               onClick={(e: React.MouseEvent) => {
                 e.preventDefault();
-                router.push(`/dashboard/${q.id}`);
+                router.push(`/dashboard/question/${q.id}`);
               }}
             >
               <div>
