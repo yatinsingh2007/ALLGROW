@@ -17,6 +17,7 @@ import {
 } from "@/context/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardPagination from "@/section/Pagination";
+import {} from "@/components/ui/select"
 
 interface TestCases {
   sample_input: string[];
@@ -45,20 +46,18 @@ export default function SidebarDemo() {
 }
 
 function SidebarDemoInner() {
-  const { isAuthenticated } = useContext(ProtectedRouteContext)!;
+  const { isAuthenticated , token , Authloading } = useContext(ProtectedRouteContext)!;
   const [data, setData] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const router = useRouter();
-
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/auth");
-      toast.error("Please Login First");
-      return;
-    }
-  }, [isAuthenticated, router]);
-
+   if (Authloading) return;
+   if (!isAuthenticated) {
+     router.push("/auth");
+     toast.error("Please login to access the dashboard");
+   }
+  }, [isAuthenticated , Authloading]);
   const links = [
     {
       label: "Dashboard",
@@ -121,6 +120,8 @@ function SidebarDemoInner() {
         loading={loading}
         setData={setData}
         setLoading={setLoading}
+        isAuthenticated={isAuthenticated}
+        token={token}
       />
     </div>
   );
@@ -152,6 +153,8 @@ interface DashboardProps {
   loading: boolean;
   setData: React.Dispatch<React.SetStateAction<Question[]>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  isAuthenticated?: boolean;
+  token?: string | null;
 }
 
 const getDifficultyColor = (difficulty: string) => {
@@ -171,26 +174,31 @@ const Dashboard: React.FC<DashboardProps> = ({
   data,
   loading,
   setData,
+  setLoading,
+  isAuthenticated,
+  token
 }) => {
-  const [page, setPage] = useState<number>(0);
-  const { isAuthenticated, token } = useContext(ProtectedRouteContext)!;
+  const [page, setPage] = useState<number>(1);
   const router = useRouter();
 
   useEffect(() => {
     (async () => {
-      if (!isAuthenticated) return;
-
+      if (!isAuthenticated || !token) {
+        return;
+      }
       try {
-        const resp = await api.get(`/dashboard/home?offset=${page * 9}`, {
+        const resp = await api.get(`/dashboard/home?offset=${(page-1) * 9}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setData(resp.data);
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch data");
+      }finally{
+        setLoading(false);
       }
     })();
-  }, [page, isAuthenticated, token, setData]);
+  }, [isAuthenticated, token, page]);
 
   return (
     <div className="flex flex-1">

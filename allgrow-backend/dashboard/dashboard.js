@@ -26,7 +26,6 @@ dashboard.get('/home' , checkUserAuthentication ,  async (req , res) => {
 
 dashboard.get('/question/:id', checkUserAuthentication , async (req , res) => {
     const { id } = req.params;
-    console.log(id);
     if (!id){
         return res.status(400).json({error : "Bad Request"});
     }

@@ -4,6 +4,7 @@ const cors = require('cors');
 const { dashboard } = require('./dashboard/dashboard');
 const express = require('express');
 const { auth } = require('./auth/auth');
+const { question } = require('./question/question');
 const { checkUserAuthentication } = require('./middleware/middleware');
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(express.json());
 app.use('/api/auth' , auth )
 
 app.use('/api/dashboard' , checkUserAuthentication , dashboard)
+
+app.use('/api/questions' , checkUserAuthentication , question)
 
 
 async function main(){
