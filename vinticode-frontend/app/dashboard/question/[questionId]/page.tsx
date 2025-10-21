@@ -3,7 +3,7 @@ import Editor , { OnChange } from "@monaco-editor/react"
 import { useParams } from "next/navigation"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 import { useEffect, useState } from "react"
-import  ProtectRouteProvider  from "@/context/ProtectedRoute"
+import  { ProtectedRouteProvider }  from "@/context/ProtectedRoute"
 import api from '@/lib/axios'
 import { input } from "motion/react-client"
 interface languageDetails{
@@ -91,7 +91,7 @@ export default function Dashboard () {
   }
   return (
     <>
-      <ProtectRouteProvider>
+      <ProtectedRouteProvider>
       <PanelGroup direction="horizontal">
         <Panel>
           <div className="p-6 text-white overflow-y-auto h-screen bg-[#111]">
@@ -198,7 +198,7 @@ export default function Dashboard () {
           </div>
         </Panel>
       </PanelGroup>
-      </ProtectRouteProvider>
+      </ProtectedRouteProvider>
     </>
   )
 }

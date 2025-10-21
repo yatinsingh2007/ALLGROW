@@ -1,29 +1,34 @@
 "use client";
-import { createContext , useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { createContext , useState , useEffect , ReactNode } from "react";
 
-interface ProtectRouteContextType {
+interface ProtectedRouteContextType {
   isAuthenticated: boolean;
-  setIsAuthenticated : React.Dispatch<React.SetStateAction<boolean>>
+  token : string | null;
 }
 
-export const ProtectRouteContext = createContext<ProtectRouteContextType | null>(null);
+const ProtectedRouteContext = createContext<ProtectedRouteContextType | undefined>(undefined);
 
-const ProtectedRouteProvider = ({ children }: { children : React.ReactNode}) => {
-  const router = useRouter();
+
+const ProtectedRouteProvider = ({ children } : {children : ReactNode}) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
+  
   useEffect(() => {
-    const token : string | null = localStorage.getItem("token");
-    if (!token){
-      router.push('/auth')
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) {
+      setIsAuthenticated(true);
+      setToken(storedToken);
+    } else {
+      setIsAuthenticated(false);
+      setToken(null);
     }
-  })
+  }, []);
 
   return (
-    <ProtectRouteContext.Provider value={{isAuthenticated , setIsAuthenticated}}>
+    <ProtectedRouteContext.Provider value={{ isAuthenticated, token }}>
       {children}
-    </ProtectRouteContext.Provider>
+    </ProtectedRouteContext.Provider>
   );
-};
+}
 
-export default ProtectedRouteProvider;
+export { ProtectedRouteContext, ProtectedRouteProvider };

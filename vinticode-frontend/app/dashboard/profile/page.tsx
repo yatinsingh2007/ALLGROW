@@ -1,10 +1,13 @@
 "use client"
-export default function Profile () : React.ReactNode{
+import { ProtectedRouteProvider } from "@/context/ProtectedRoute"
+export default function Profile(): React.ReactNode {
     return (
         <>
-            <main>
+            <ProtectedRouteProvider>
+                <main>
 
-            </main>
+                </main>
+            </ProtectedRouteProvider>
         </>
     )
 }

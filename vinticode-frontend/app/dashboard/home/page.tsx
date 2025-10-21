@@ -1,18 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
 import {
   IconArrowLeft,
   IconBrandTabler,
-  IconSettings,
   IconUserBolt,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import ProtectRouteProvider from "@/context/ProtectedRoute";
+import  { ProtectedRouteProvider , ProtectedRouteContext } from "@/context/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 import  DashboardPagination  from "@/section/Pagination";
 interface testCases {
@@ -37,22 +36,14 @@ export default function SidebarDemo() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { isAuthenticated } = useContext(ProtectedRouteContext)!;
 
   useEffect(() => {
-    (async () => {
-      try {
-        const token: string | null = localStorage.getItem("token");
-        const resp = await api.get(`/dashboard/home`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setData(resp.data);
-      } catch (err) {
-        console.error(err);
-        toast.error("Something Went Wrong");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    if (!isAuthenticated){
+      router.push('/auth');
+      toast.error("Please Login First");
+      return;
+    }
   }, []);
 
 
@@ -81,7 +72,7 @@ export default function SidebarDemo() {
   ];
 
   return (
-    <ProtectRouteProvider>
+    <ProtectedRouteProvider>
       <div
         className={cn(
           "mx-auto flex w-full flex-1 flex-col overflow-hidden rounded-md border border-neutral-800 bg-neutral-950 md:flex-row",
@@ -119,9 +110,9 @@ export default function SidebarDemo() {
             </div>
           </SidebarBody>
         </Sidebar>
-        <Dashboard data={data} loading={loading} setData={setData} />
+        <Dashboard data={data} loading={loading} setData={setData} setLoading={setLoading} />
       </div>
-    </ProtectRouteProvider>
+    </ProtectedRouteProvider>
   );
 }
 
@@ -150,6 +141,7 @@ interface DashboardProps {
   data: Question[];
   loading: boolean;
   setData: React.Dispatch<React.SetStateAction<Question[]>>;
+  setLoading : React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const getDifficultyColor = (difficulty: string) => {
@@ -167,10 +159,13 @@ const getDifficultyColor = (difficulty: string) => {
 
 const Dashboard: React.FC<DashboardProps> = ({ data, loading , setData }) => {
   const [ page , setPage ] = useState<number>(0);
+  const { isAuthenticated , token} = useContext(ProtectedRouteContext)!;
   useEffect(() => {
     (async () => {
+      if (!isAuthenticated){
+        return;
+      }
       try{
-        const token: string | null = localStorage.getItem("token");
         const resp = await api.get(`/dashboard/home?offset=${page * 9}` , {
           headers: { Authorization: `Bearer ${token}` },
         });
