@@ -18,11 +18,12 @@ question.post('/runCode/:id' , checkUserAuthentication , async (req , res) => {
         const response = await api.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true" , {
             source_code : code,
             language_id : language_id,
-            stdin : input ? input : "",
-            expected_output : "",
+            stdin : input ? input : ""
+        } , {
             headers : {
-                "X-RapidAPI-Host": process.env.user_`${randomInt}`.x-rapidapi-host,
-                "X-RapidAPI-Key": process.env.user_`${randomInt}`.x-rapidapi-key
+                "Content-Type": "application/json",
+                "X-RapidAPI-Host": JSON.parse(process.env[`USER_${randomInt}`])['x-rapidapi-host'],
+                "X-RapidAPI-Key": JSON.parse(process.env[`USER_${randomInt}`])['x-rapidapi-key']
         }
         })
         const result = response.data;
@@ -37,6 +38,7 @@ question.post('/runCode/:id' , checkUserAuthentication , async (req , res) => {
 question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) => {
     const { code , language_id } = req.body;
     const { id } = req.params;
+    const randomInt = Math.floor(Math.random() * 5) + 1;
     try {
         const questionData = await prisma.questions.findUnique({
             where : {
@@ -59,8 +61,8 @@ question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) =
                 },
                 {
                 headers : {
-                    "X-RapidAPI-Host": process.env.user_1['x-rapidapi-host'],
-                    "X-RapidAPI-Key": process.env.user_1['x-rapidapi-key']
+                    "X-RapidAPI-Host": process.env.USER_`${randomInt}`['x-rapidapi-host'],
+                    "X-RapidAPI-Key": process.env.USER_`${randomInt}`['x-rapidapi-key']
             }
             })
                 return res.data;

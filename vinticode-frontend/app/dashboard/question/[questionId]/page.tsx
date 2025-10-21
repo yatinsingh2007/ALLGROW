@@ -39,6 +39,21 @@ interface questionData {
   updatedAt: Date;
 }
 
+interface Output {
+  stdout: string;
+  stderr: string | null;
+  compile_output: string | null;
+  message: string | null;
+  time: string;
+  memory: number;
+  token: string;
+  status: {
+    id: number;
+    description: string;
+  };
+}
+
+
 export default function Dashboard() {
   const { questionId } = useParams();
   const [questionData, setQuestionData] = useState<questionData>({
@@ -81,28 +96,41 @@ export default function Dashboard() {
     language: "python",
     id: 71,
   });
-  const languages: languageDetails[] = [
-  { language: "python", id: 71 },
-  { language: "cpp", id: 54 },
-  { language: "java", id: 62 },
-  { language: "javascript", id: 63 },
-];
   const [fontSize, setFontSize] = useState<number>(16);
-  const [output, setOutput] = useState<string>("");
+  const [output, setOutput] = useState<Output>({
+    stdout: "",
+    stderr: "",
+    compile_output: "",
+    message: "",
+    time: "",
+    memory: 0,
+    token: "",
+    status: {
+      id: 0,
+      description: "",
+    },
+  });
   const [customInput, setCustomInput] = useState<string>("");
   const [code, setCode] = useState<string>("");
 
   const handleRun = async () => {
-    const token = localStorage.getItem("token") || "";
-    const result: string = await api.post("/dashboard/run", {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      code,
-      input: customInput,
-      questionId,
-    });
-    setOutput(result);
+    try{
+      const token = localStorage.getItem("token") || "";
+      const response = await api.post(`/questions/runCode/${questionData.id}`, {
+        code,
+        input: customInput,
+        questionId,
+        language_id: language.id
+      } , {
+        headers : {
+          authorization : `Bearer ${token}`
+        }
+      }
+    );
+      setOutput(response.data.result);
+    }catch(err){
+      console.error(err);
+    }
   };
 
   const handleCodeChange: OnChange = (value) => {
@@ -110,6 +138,13 @@ export default function Dashboard() {
       setCode(value);
     }
   };
+    
+  const languages: languageDetails[] = [
+  { language: "python", id: 71 },
+  { language: "cpp", id: 54 },
+  { language: "java", id: 62 },
+  { language: "javascript", id: 63 },
+];
 
   return (
     <>
@@ -181,10 +216,10 @@ export default function Dashboard() {
                 <div className="flex items-center gap-3">
                   <Select
                     onValueChange={(value) => {
-                      const selected = languages.find(
-                        (lang) => lang.language === value
-                      );
-                      if (selected) setLanguage(selected);
+                      const selected = languages.find((lang) => lang.language === value);
+                      if (selected) {
+                        setLanguage(selected);
+                      }
                     }}
                     value={language.language}
                   >
@@ -254,7 +289,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex-1 p-3 text-green-400 font-mono text-sm overflow-auto">
                   <label className="block text-gray-400 mb-1">Output:</label>
-                  <pre>{output || "Output will appear here..."}</pre>
+                  <pre>{output.stdout || "Output will appear here..."}</pre>
                 </div>
               </div>
             </div>
