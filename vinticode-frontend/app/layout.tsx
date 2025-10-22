@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Vinticode",
   description: "Start buliding basic intuition of DSA and code your way to mastery.",
-  verification : {
-    google : "49oDVt61a_BJcs7UCCP6hc30N1MUU3WU7sOC92jdL8s"
-  }
 };
 
 export default function RootLayout({
@@ -28,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Allgrow — Practice DSA from Basics to Mastery</title>
+          <meta name="google-site-verification" content="L63uGSjv-ig202O9O7OB6XKbgHRQHhHyiKmkxhoJjNw" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}
