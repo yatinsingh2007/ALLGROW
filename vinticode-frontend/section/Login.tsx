@@ -25,8 +25,6 @@ export default function Login() {
     const [details , setDetails] = useState<Credentials>({name : "" , email: "", password: ""});
     const handleLogin = async (e : React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        toast.loading("Loading...");
-        router.push("/dashboard/home");
         try{
             const res = await api.post("/auth/login" , {
                 email : details.email ,

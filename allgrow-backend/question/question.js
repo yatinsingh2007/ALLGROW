@@ -61,8 +61,8 @@ question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) =
                 },
                 {
                 headers : {
-                    "X-RapidAPI-Host": process.env.USER_`${randomInt}`['x-rapidapi-host'],
-                    "X-RapidAPI-Key": process.env.USER_`${randomInt}`['x-rapidapi-key']
+                    "X-RapidAPI-Host": JSON.parse(process.env[`USER_${randomInt}`])['x-rapidapi-host'],
+                    "X-RapidAPI-Key": JSON.parse(process.env[`USER_${randomInt}`])['x-rapidapi-key']
             }
             })
                 return res.data;
