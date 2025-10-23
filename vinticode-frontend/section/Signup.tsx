@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { ShineBorder } from "@/components/magicui/shine-border"
+import { EyeOff , Eye } from "lucide-react"
 import React, { useState } from "react"
 import api from "@/lib/axios"
 import toast from "react-hot-toast"
@@ -15,7 +16,8 @@ interface User{
 }
 
 export default function SignupCard() {
-  const [userDetails , setUserDetails] = useState<User>({name : "" , email : "" , password : "" , confirmPassword : ""})
+  const [userDetails , setUserDetails] = useState<User>({name : "" , email : "" , password : "" , confirmPassword : ""});
+  const [passwordType , setPasswordType] = useState<"password" | "text">("password");
   const handleSignup = async (e : React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (userDetails.password !== userDetails.confirmPassword){
@@ -59,19 +61,21 @@ export default function SignupCard() {
 
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , password : e.target.value }) }/>
+              <Input id={passwordType} type={passwordType} placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , password : e.target.value }) } className="relative"/>
+                {passwordType === "password" ? <EyeOff className="absolute right-7 bottom-[10.3rem]" onClick={() =>setPasswordType("text")}/> : <Eye className="absolute right-7 bottom-[10.3rem]" onClick={() => setPasswordType("password")}/>}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input id="confirm-password" type="password" placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , confirmPassword : e.target.value}) }/>
+              <Input id={passwordType} type={passwordType} placeholder="*******" required onChange={(e : React.ChangeEvent<HTMLInputElement>) => setUserDetails({...userDetails , confirmPassword : e.target.value}) } className="relative"/>
+                {passwordType === "password" ? <EyeOff className="absolute right-7 bottom-[5.5rem]" onClick={() => setPasswordType("text")}/> : <Eye className="absolute right-7 bottom-[5.5rem]" onClick={() => setPasswordType("password")}/>}
             </div>
           </div>
         </form>
       </CardContent>
 
       <CardFooter>
-        <Button className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer" onClick={handleSignup}>Create Account</Button>
+        <Button className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer" onClick={handleSignup} type="submit">Create Account</Button>
       </CardFooter>
     </Card>
   )

@@ -1,5 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
+import { Eye , EyeOff } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ interface Credentials {
 export default function Login() {
     const router = useRouter();
     const [details , setDetails] = useState<Credentials>({name : "" , email: "", password: ""});
+    const [passwordType , setPasswordType] = useState<"password" | "text">("password")
     const handleLogin = async (e : React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         try{
@@ -61,15 +63,18 @@ export default function Login() {
                 </div>
                 <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="*********" onChange={(e : React.ChangeEvent<HTMLInputElement>) => 
+                <Input id={passwordType} type={passwordType} placeholder="*********" onChange={(e : React.ChangeEvent<HTMLInputElement>) => 
                     setDetails({...details , password : e.target.value})
-                }/>
+                } className="relative"/>
+                {
+                passwordType == "password" ? <EyeOff className="absolute right-8 bottom-[5.5rem] cursor-pointer" onClick={() => setPasswordType("text")}/>  : <Eye className="absolute right-8 bottom-[5.5rem] cursor-pointer" onClick={() => setPasswordType("password")}/>
+                }
                 </div>
             </div>
             </form>
         </CardContent>
         <CardFooter>
-            <Button className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer" onClick={handleLogin}>Sign In</Button>
+            <Button className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer" onClick={handleLogin} type="submit">Sign In</Button>
         </CardFooter>
         </Card>
     )
