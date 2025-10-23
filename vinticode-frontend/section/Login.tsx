@@ -38,9 +38,8 @@ export default function Login() {
             toast.dismiss()
             return
         }catch(err){
-            toast.error("Something went wrong");
             console.log(err);
-            return
+            return toast.error(err.response?.data.error)
         }
     }
     return (

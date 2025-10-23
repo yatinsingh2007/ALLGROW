@@ -8,6 +8,7 @@ import { EyeOff , Eye } from "lucide-react"
 import React, { useState } from "react"
 import api from "@/lib/axios"
 import toast from "react-hot-toast"
+import { isAxiosError } from "axios"
 interface User{
   name : string ,
   email : string ,
@@ -31,8 +32,13 @@ export default function SignupCard() {
       });
       toast.success("Account created successfully !! , Now Please Login");
     }catch(err){
-      console.log(err);
-      return toast.error("Something went wrong")
+      if (isAxiosError(err)){
+        console.log(err);
+        return toast.error(err.response?.data.error)
+      }else{
+        console.log(err);
+        return toast.error("Something unexpected happend")
+      }
     }
   }
   return (
