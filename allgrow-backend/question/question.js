@@ -82,12 +82,15 @@ question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) =
 
         for (let status of resultSummary){
             if (status !== "Accepted"){
-                await prisma.submissions.create({
-                    data : {
-                        userId : req.user.id,
-                        questionId : id,
-                        status : "Failed"
-                    }
+                await prisma.$transaction(async (tx) => {
+                    await tx.submissions.create({
+                        data : {
+                            userId : req.user.id ,
+                            questionId : id ,
+                            status : `rejected`,
+                            code : code
+                        }
+                    })
                 })
                 return res.status(200).json({
                     "message" : "Some Test Cases Failed",
@@ -95,15 +98,22 @@ question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) =
                 })
             }
         }
-
-        await prisma.submissions.create({
-            data : {
-                userId : req.user.id,
-                questionId : id,
-                status : "Submitted"
-            }
+        await prisma.$transaction(async (tx) => {
+            await tx.user.update({
+                where : {
+                    id : req.user.id ,
+                } ,
+                data : {
+                    solvedQuestions : {
+                        create : {
+                    questionId : id ,
+                    status : "accepted" ,
+                    code : code
+                }
+                    }
+                }
+            })
         })
-
         return res.status(200).json({
             "message" : "All Test Cases Passed",
             "results" : resultSummary

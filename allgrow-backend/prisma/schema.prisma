@@ -42,8 +42,6 @@ model Submissions {
   updatedAt  DateTime  @updatedAt
   user       User      @relation("UserSolved", fields: [userId], references: [id])
   question   Questions @relation("QuestionSolved", fields: [questionId], references: [id])
-
-  @@unique([userId, questionId])
 }
 
 enum Status {
