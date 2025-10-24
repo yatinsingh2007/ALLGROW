@@ -5,9 +5,7 @@ import { useParams } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useEffect, useState } from "react";
 import { ProtectedRouteProvider } from "@/context/ProtectedRoute";
-import { Confetti } from "@/components/ui/confetti";
 import api from "@/lib/axios";
-import { ConfettiDemo } from "@/section/Confetti";
 import {
   Select,
   SelectContent,
@@ -198,11 +196,7 @@ export default function Dashboard() {
   return (
     <>
       <ProtectedRouteProvider>
-        {sloader && <ConfettiDemo />}
-        <Confetti className="absolute top-0 left-0 z-0 size-full pointer-events-none" />
-
         <PanelGroup direction="horizontal">
-          {/* LEFT PANEL - Question */}
           <Panel>
             <div className="p-6 text-white overflow-y-auto h-screen bg-[#111]">
               <h1 className="text-2xl font-bold mb-2">{questionData.title}</h1>
@@ -253,8 +247,6 @@ export default function Dashboard() {
           </Panel>
 
           <PanelResizeHandle className="w-1 bg-gray-700" />
-
-          {/* RIGHT PANEL - Editor */}
           <Panel>
             <div className="flex flex-col h-screen bg-[#0f0f0f]">
               {/* Toolbar */}
@@ -322,8 +314,6 @@ export default function Dashboard() {
                   </Button>
                 </div>
               </div>
-
-              {/* Editor */}
               <div className="flex-1">
                 <Editor
                   height="100%"
@@ -338,8 +328,6 @@ export default function Dashboard() {
                   }}
                 />
               </div>
-
-              {/* Output Area */}
               <div className="h-60 flex flex-col bg-black border-t border-gray-700">
                 <div className="p-3 border-b border-gray-700">
                   <label className="block text-gray-400 mb-1">
@@ -353,7 +341,6 @@ export default function Dashboard() {
                     rows={3}
                   />
                 </div>
-
                 <div className="flex-1 p-3 text-green-400 font-mono text-sm overflow-auto">
                   <label className="block text-gray-400 mb-1">Output:</label>
                   <pre>{output.stdout || "Output will appear here..."}</pre>
