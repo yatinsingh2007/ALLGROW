@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface languageDetails {
   language: string;
@@ -191,12 +192,16 @@ export default function Dashboard() {
     { language: "javascript", id: 63 },
   ];
 
+  const router = useRouter()
+
   return (
     <ProtectedRouteProvider>
       <PanelGroup direction="horizontal">
-        {/* LEFT QUESTION PANEL */}
         <Panel defaultSize={40}>
-          <div className="p-6 text-white overflow-y-auto h-screen bg-[#111]">
+          <Button className="fixed top-2 left-2 bg-black text-white hover:bg-white hover:text-black cursor-pointer" onClick={() => router.push('/dashboard/home')}>
+            Back
+          </Button>
+          <div className="p-6 text-white overflow-y-auto h-screen bg-[#111] pt-14">
             <h1 className="text-2xl font-bold mb-2">{questionData.title}</h1>
             <div
               className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${questionData.difficulty === "Easy"

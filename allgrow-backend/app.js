@@ -8,7 +8,11 @@ const { question } = require('./question/question');
 const { checkUserAuthentication } = require('./middleware/middleware');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin : ['http://localhost:7777'],
+    methods : ['GET' , 'POST' , 'PUT' , 'PATCH' , 'DELETE'],
+    credentials : true
+}));
 
 app.use(express.json());
 

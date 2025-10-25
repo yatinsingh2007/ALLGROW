@@ -61,17 +61,17 @@ function SidebarDemoInner() {
   const links = [
     {
       label: "Dashboard",
-      href: "#",
+      href: "/dashboard/home",
       icon: <IconBrandTabler className="h-5 w-5 shrink-0 text-neutral-300" />,
     },
     {
       label: "Profile",
-      href: "#",
+      href: "/dashboard/profile",
       icon: <IconUserBolt className="h-5 w-5 shrink-0 text-neutral-300" />,
     },
     {
       label: "Logout",
-      href: "#",
+      href: "/auth",
       icon: <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-300" />,
     },
   ];
