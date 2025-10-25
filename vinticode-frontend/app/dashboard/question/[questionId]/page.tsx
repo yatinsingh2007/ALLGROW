@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useEffect, useState } from "react";
 import { ProtectedRouteProvider } from "@/context/ProtectedRoute";
+import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/axios";
 import {
   Select,
@@ -40,6 +41,7 @@ interface questionData {
   difficulty: string;
   createdAt: Date;
   updatedAt: Date;
+  done : boolean
 }
 
 interface Output {
@@ -56,8 +58,27 @@ interface Output {
   };
 }
 
+interface Submission {
+  id: string | null;
+  userId: string | null;
+  questionId: string | null;
+  code: string | null;
+  status: "accepted" | "rejected" | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  question: questionData;
+}
+
+interface Submissions {
+  submissions: Submission[];
+}
+
 export default function Dashboard() {
   const { questionId } = useParams();
+
+  const [submissions, setSubmissions] = useState<Submissions>({
+    submissions: [],
+  });
 
   const [questionData, setQuestionData] = useState<questionData>({
     id: "",
@@ -76,6 +97,7 @@ export default function Dashboard() {
     difficulty: "",
     createdAt: new Date(),
     updatedAt: new Date(),
+    done : false
   });
 
   useEffect(() => {
@@ -192,51 +214,74 @@ export default function Dashboard() {
     { language: "javascript", id: 63 },
   ];
 
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <ProtectedRouteProvider>
       <PanelGroup direction="horizontal">
         <Panel defaultSize={40}>
-          <Button className="fixed top-2 left-2 bg-black text-white hover:bg-white hover:text-black cursor-pointer" onClick={() => router.push('/dashboard/home')}>
+          <Button
+            className="fixed top-2 left-2 bg-black text-white hover:bg-white hover:text-black cursor-pointer"
+            onClick={() => router.push("/dashboard/home")}
+          >
             Back
           </Button>
           <div className="p-6 text-white overflow-y-auto h-screen bg-[#111] pt-14">
-            <h1 className="text-2xl font-bold mb-2">{questionData.title}</h1>
-            <div
-              className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${questionData.difficulty === "Easy"
-                  ? "bg-green-600/20 text-green-400"
-                  : questionData.difficulty === "Medium"
-                    ? "bg-yellow-600/20 text-yellow-400"
-                    : "bg-red-600/20 text-red-400"
-                }`}
-            >
-              {questionData.difficulty}
-            </div>
+            {questionData.title ? (
+              <>
+                <h1 className="text-2xl font-bold mb-2">
+                  {questionData.title}
+                </h1>
+                <div
+                  className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${questionData.difficulty === "Easy"
+                      ? "bg-green-600/20 text-green-400"
+                      : questionData.difficulty === "Medium"
+                        ? "bg-yellow-600/20 text-yellow-400"
+                        : "bg-red-600/20 text-red-400"
+                    }`}
+                >
+                  {questionData.difficulty}
+                </div>
 
-            <p className="text-gray-300 leading-relaxed mb-4">
-              {questionData.description}
-            </p>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  {questionData.description}
+                </p>
 
-            <h3 className="text-lg font-semibold mt-2">Input Format:</h3>
-            <pre className="text-gray-400 whitespace-pre-wrap mb-3">
-              {questionData.input_format}
-            </pre>
+                <h3 className="text-lg font-semibold mt-2">Input Format:</h3>
+                <pre className="text-gray-400 whitespace-pre-wrap mb-3">
+                  {questionData.input_format}
+                </pre>
 
-            <h3 className="text-lg font-semibold">Output Format:</h3>
-            <pre className="text-gray-400 whitespace-pre-wrap mb-3">
-              {questionData.output_format}
-            </pre>
+                <h3 className="text-lg font-semibold">Output Format:</h3>
+                <pre className="text-gray-400 whitespace-pre-wrap mb-3">
+                  {questionData.output_format}
+                </pre>
 
-            <h3 className="text-lg font-semibold">Sample Input:</h3>
-            <pre className="bg-[#1a1a1a] p-3 rounded-md mb-3">
-              {questionData.sample_input}
-            </pre>
+                <h3 className="text-lg font-semibold">Sample Input:</h3>
+                <pre className="bg-[#1a1a1a] p-3 rounded-md mb-3">
+                  {questionData.sample_input}
+                </pre>
 
-            <h3 className="text-lg font-semibold">Sample Output:</h3>
-            <pre className="bg-[#1a1a1a] p-3 rounded-md">
-              {questionData.sample_output}
-            </pre>
+                <h3 className="text-lg font-semibold">Sample Output:</h3>
+                <pre className="bg-[#1a1a1a] p-3 rounded-md">
+                  {questionData.sample_output}
+                </pre>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-3/4 bg-gray-700 rounded-md" />
+                <Skeleton className="h-5 w-24 bg-gray-700 rounded-full" />
+                <Skeleton className="h-24 w-full bg-gray-700 rounded-md" />
+                <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
+                <Skeleton className="h-12 w-full bg-gray-700 rounded-md" />
+                <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
+                <Skeleton className="h-12 w-full bg-gray-700 rounded-md" />
+                <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
+                <Skeleton className="h-10 w-full bg-gray-700 rounded-md" />
+                <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
+                <Skeleton className="h-10 w-full bg-gray-700 rounded-md" />
+              </div>
+            )}
           </div>
         </Panel>
 
@@ -330,7 +375,9 @@ export default function Dashboard() {
             <Panel defaultSize={30}>
               <div className="h-full bg-black border-t border-gray-700 flex flex-col">
                 <div className="p-3 border-b border-gray-700">
-                  <label className="block text-gray-400 mb-1">Custom Input:</label>
+                  <label className="block text-gray-400 mb-1">
+                    Custom Input:
+                  </label>
                   <textarea
                     value={customInput}
                     onChange={(e) => setCustomInput(e.target.value)}

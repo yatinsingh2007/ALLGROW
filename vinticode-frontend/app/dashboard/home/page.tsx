@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
+import { CheckCircle2 } from "lucide-react";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -35,6 +36,7 @@ interface Question {
   difficulty: string;
   createdAt: Date;
   updatedAt: Date;
+  done : false
 }
 
 export default function SidebarDemo() {
@@ -214,7 +216,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                   router.push(`/dashboard/question/${q.id}`);
                 }}
               >
-                <div>
+                <div className="relative">
+                  {q.done && <CheckCircle2 className="text-green-500 w-5 h-5 mb-1 absolute top-1 right-1" />}
                   <h2 className="mb-2 text-lg font-semibold text-white">
                     {q.title}
                   </h2>

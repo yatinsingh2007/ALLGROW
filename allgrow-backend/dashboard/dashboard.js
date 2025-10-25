@@ -4,10 +4,8 @@ const { prisma } = require('../prisma/prismaClient');
 
 const dashboard = express.Router()
 
-const { checkUserAuthentication } = require('../middleware/middleware')
 
-
-dashboard.get('/home' , checkUserAuthentication ,  async (req , res) => {
+dashboard.get('/home' , async (req , res) => {
   let { offset } = req.query;
   if (!offset){
     offset = 0;
@@ -17,14 +15,33 @@ dashboard.get('/home' , checkUserAuthentication ,  async (req , res) => {
         skip : parseInt(offset),
         take : 9
      });
-      return res.status(200).json(allQuestions);
+
+     const completedQuestions = await prisma.questions.findMany({
+      where : {
+        solvedQuestions : {
+          some : {
+            status : 'accepted' ,
+            userId : req.user.id
+          }
+        }
+      } ,
+      select : { id : true} ,
+      distinct : ["id"]
+     })
+     return res.status(200).json(allQuestions.map((question) => {
+      if (completedQuestions.some((q) => q.id === question.id)){
+        return {...question , done : true}
+      }else{
+        return {...question , done : false}
+      }
+     }))
   }catch(err){
       console.log(err);
       return res.status(500).json({error : "Internal Server Error"});
   }
 })
 
-dashboard.get('/question/:id', checkUserAuthentication , async (req , res) => {
+dashboard.get('/question/:id', async (req , res) => {
     const { id } = req.params;
     if (!id){
         return res.status(400).json({error : "Bad Request"});
@@ -46,6 +63,4 @@ dashboard.get('/question/:id', checkUserAuthentication , async (req , res) => {
 })
 
 
-module.exports = {
-    dashboard
-}
+module.exports = { dashboard }

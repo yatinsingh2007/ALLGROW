@@ -1,17 +1,16 @@
 require('dotenv').config();
+
 const express = require('express');
 
 const { prisma } = require('../prisma/prismaClient');
 
 const question = express.Router();
 
-const { checkUserAuthentication } = require('../middleware/middleware');
-
 const { api } = require('../utils')
 
 
 
-question.post('/runCode/:id' , checkUserAuthentication , async (req , res) => {
+question.post('/runCode/:id' , async (req , res) => {
     const randomInt = Math.floor(Math.random() * 5) + 1;
     const { code , language_id , input } = req.body;
     try {
@@ -35,7 +34,7 @@ question.post('/runCode/:id' , checkUserAuthentication , async (req , res) => {
     }
 })
 
-question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) => {
+question.post('/submitCode/:id' , async (req , res) => {
     const { code , language_id } = req.body;
     const { id } = req.params;
     const randomInt = Math.floor(Math.random() * 5) + 1;
@@ -127,7 +126,7 @@ question.post('/submitCode/:id' , checkUserAuthentication ,  async (req , res) =
     }
 })
 
-question.get('/submissions/:id' , checkUserAuthentication , async (req , res) => {
+question.get('/submissions/:id' , async (req , res) => {
     try{
         const ourUser = req.user;
         const { id } = req.params;
@@ -151,22 +150,16 @@ question.get('/submissions/:id' , checkUserAuthentication , async (req , res) =>
     }
 })
 
-question.get('/submittedQuestions' , checkUserAuthentication , async (req , res) => {
+
+question.get('/submission/:id' , async (req , res) => {
     try{
-        const ourUser = req.user;
-        const data = await prisma.submissions.findMany({
+        const { id } = req.params;
+        const submissionData = await prisma.submissions.findUnique({
             where : {
-                userId : ourUser.id ,
-                status : "Submitted"
-            },
-            include : {
-                question : true
-            } ,
-            distinct : ['questionId']
+                id : id
+            }
         })
-        return res.status(200).json({
-            "submissions" : data
-        })
+        return res.status(200).json(submissionData);
     }catch(err){
         console.log(err);
         return res.status(500).json({

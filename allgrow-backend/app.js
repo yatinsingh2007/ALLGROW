@@ -6,10 +6,12 @@ const express = require('express');
 const { auth } = require('./auth/auth');
 const { question } = require('./question/question');
 const { checkUserAuthentication } = require('./middleware/middleware');
+const { profile } = require('./profile/profile');
 const app = express();
+const PORT = process.env.FRONTEND_PORT
 
 app.use(cors({
-    origin : ['http://localhost:7777'],
+    origin : [`http://localhost:${PORT}`],
     methods : ['GET' , 'POST' , 'PUT' , 'PATCH' , 'DELETE'],
     credentials : true
 }));
@@ -21,6 +23,8 @@ app.use('/api/auth' , auth )
 app.use('/api/dashboard' , checkUserAuthentication , dashboard)
 
 app.use('/api/questions' , checkUserAuthentication , question)
+
+app.use('/api/userprofile' , checkUserAuthentication , profile)
 
 
 async function main(){
