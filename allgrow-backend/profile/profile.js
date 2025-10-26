@@ -1,6 +1,5 @@
 const express = require("express");
 const { prisma } = require("../prisma/prismaClient");
-const { checkUserAuthentication } = require("../middleware/middleware");
 const profile = express.Router();
 
 profile.get("/submissions", async (req, res) => {
