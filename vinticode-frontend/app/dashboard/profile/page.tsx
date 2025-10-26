@@ -1,47 +1,69 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { ProtectedRouteProvider } from "@/context/ProtectedRoute";
-import CalendarHeatmap from "react-calendar-heatmap";
+import CalendarHeatmap, { ReactCalendarHeatmapValue, TooltipDataAttrs } from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import { Tooltip } from "react-tooltip";
 import api from '@/lib/axios';
+
 interface Value {
-    date: Date;
-    count: number
+  date: string; // backend returns string date
+  count: number;
 }
 
 export default function Profile() {
-    const [values, setValues] = useState<Value[]>([])
-    useEffect(() => {
-        (async() => {
-            const token = localStorage.getItem('token');
-            const response = await api.get('/userprofile/heat-map-details' , {
-                headers : {
-                    Authorization : `Bearer ${token}`
-                }
-            });
-            setValues(response.data)
-        })();
-    } , [])
+  const [values, setValues] = useState<Value[]>([]);
 
-    return (
-        <ProtectedRouteProvider>
-            <main className="p-4">
-                <h1 className="text-xl font-semibold mb-4 text-white">Your Streak</h1>
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get<Value[]>('/userprofile/heat-map-details', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-                <CalendarHeatmap
-                    startDate={new Date("2025-01-01")}
-                    endDate={new Date(Date.now())}
-                    values={values}
-                    tooltipDataAttrs={(value) => ({
-                        "data-tip": value?.date
-                            ? `${value.date}: ${value.count} solved`
-                            : "No activity",
-                    })}
-                    showWeekdayLabels
-                />
-                <Tooltip />
-            </main>
-        </ProtectedRouteProvider>
-    );
+        // convert string dates to Date objects
+        const formattedValues = response.data.map(v => ({
+          ...v,
+          date: v.date, // keep as string for CalendarHeatmap (or use new Date(v.date) if you prefer Date)
+        }));
+
+        setValues(formattedValues);
+      } catch (err) {
+        console.error("Failed to fetch heatmap data:", err);
+      }
+    })();
+  }, []);
+
+  return (
+    <ProtectedRouteProvider>
+      <main className="p-4">
+        <h1 className="text-xl font-semibold mb-4 text-white">Your Streak</h1>
+
+        <CalendarHeatmap
+          startDate={new Date("2025-01-01")}
+          endDate={new Date()}
+          values={values}
+          classForValue={(value) => {
+            if (!value || value.count === 0) return "color-empty";
+            if (value.count >= 4) return "color-scale-4";
+            if (value.count >= 3) return "color-scale-3";
+            if (value.count >= 2) return "color-scale-2";
+            return "color-scale-1";
+          }}
+          tooltipDataAttrs={(value: ReactCalendarHeatmapValue | undefined): TooltipDataAttrs => ({
+            "data-tooltip-id": "heatmap-tooltip",
+            "data-tooltip-content": value?.date
+              ? `${value.date}: ${value.count} solved`
+              : "No activity",
+          })}
+          showWeekdayLabels
+        />
+
+        {/* Tooltip */}
+        <Tooltip id="heatmap-tooltip" />
+      </main>
+    </ProtectedRouteProvider>
+  );
 }
