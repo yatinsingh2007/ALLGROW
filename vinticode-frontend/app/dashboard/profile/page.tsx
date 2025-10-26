@@ -8,7 +8,7 @@ import { Tooltip } from "react-tooltip";
 import api from '@/lib/axios';
 
 interface Value {
-  date: string; // backend returns string date
+  date: string;
   count: number;
 }
 
@@ -22,11 +22,9 @@ export default function Profile() {
         const response = await api.get<Value[]>('/userprofile/heat-map-details', {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        // convert string dates to Date objects
         const formattedValues = response.data.map(v => ({
           ...v,
-          date: v.date, // keep as string for CalendarHeatmap (or use new Date(v.date) if you prefer Date)
+          date: v.date,
         }));
 
         setValues(formattedValues);
@@ -52,7 +50,7 @@ export default function Profile() {
             if (value.count >= 2) return "color-scale-2";
             return "color-scale-1";
           }}
-          tooltipDataAttrs={(value: ReactCalendarHeatmapValue | undefined): TooltipDataAttrs => ({
+          tooltipDataAttrs={(value: ReactCalendarHeatmapValue<Value> | undefined): TooltipDataAttrs => ({
             "data-tooltip-id": "heatmap-tooltip",
             "data-tooltip-content": value?.date
               ? `${value.date}: ${value.count} solved`
