@@ -33,7 +33,7 @@ export default function Profile() {
                     startDate={new Date("2025-01-01")}
                     endDate={new Date(Date.now())}
                     values={values}
-                    tooltipDataAttrs={(value: Value) => ({
+                    tooltipDataAttrs={(value) => ({
                         "data-tip": value?.date
                             ? `${value.date}: ${value.count} solved`
                             : "No activity",
