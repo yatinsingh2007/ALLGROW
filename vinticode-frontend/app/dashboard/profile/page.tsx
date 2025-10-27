@@ -15,12 +15,8 @@ export default function Profile() {
   useEffect(() => {
     (async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await api.get<HeatmapValue[]>('/userprofile/heat-map-details', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setValues(response.data); // [{date: '2025-01-01', count: 3}, ...]
+        const response = await api.get<HeatmapValue[]>('/userprofile/heat-map-details');
+        setValues(response.data);
       } catch (err) {
         console.error("Failed to fetch heatmap data:", err);
       }

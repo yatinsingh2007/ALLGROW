@@ -9,10 +9,13 @@ const { question } = require('./question/question');
 const { checkUserAuthentication } = require('./middleware/middleware');
 const { profile } = require('./profile/profile');
 const app = express();
-const PORT = process.env.FRONTEND_PORT || 3000
+const PORT = process.env.FRONTEND_PORT
 
 app.use(cors({
-    origin : `https://vinticode.vercel.app`,
+    origin : [
+        `http://localhost:${PORT}`,
+        'https://vinticode.vercel.app'
+    ] ,
     methods : ['GET' , 'POST' , 'PUT' , 'PATCH' , 'DELETE'],
     credentials : true
 }));

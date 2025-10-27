@@ -143,7 +143,6 @@ export default function Dashboard() {
   const handleRun = async () => {
     try {
       setRloader(true);
-      const token = localStorage.getItem("token") || "";
       const response = await api.post(
         `/questions/runCode/${questionData.id}`,
         {
@@ -151,11 +150,6 @@ export default function Dashboard() {
           input: customInput,
           questionId,
           language_id: language.id,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
         }
       );
       setOutput(response.data.result);
