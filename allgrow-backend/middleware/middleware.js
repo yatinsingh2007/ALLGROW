@@ -4,15 +4,9 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const checkUserAuthentication = async (req , res , next) => {
-    const { authorization } = req.headers;
+    console.log(req.cookies)
+    const { token } = req.cookies;
 
-    if (!authorization || !authorization.startsWith('Bearer ')){
-        return res.status(401).json(
-            { error: "Unauthorized" }
-        );
-    }
-
-    const token = authorization.split(' ')[1];
     try {
         const decoded = jwt.verify(token , process.env.JWT_SECRET);
         const ourUser = await prisma.user.findUnique({

@@ -2,6 +2,7 @@ require('dotenv').config();
 const { prisma } = require('./prisma/prismaClient');
 const cors = require('cors');
 const { dashboard } = require('./dashboard/dashboard');
+const cookieParser = require('cookie-parser');
 const express = require('express');
 const { auth } = require('./auth/auth');
 const { question } = require('./question/question');
@@ -11,12 +12,15 @@ const app = express();
 const PORT = process.env.FRONTEND_PORT || 3000
 
 app.use(cors({
-    origin : [`http://localhost:${PORT}` , `https://vinticode.vercel.app`],
+    origin : `https://vinticode.vercel.app`,
     methods : ['GET' , 'POST' , 'PUT' , 'PATCH' , 'DELETE'],
     credentials : true
 }));
 
+
 app.use(express.json());
+
+app.use(cookieParser())
 
 app.use('/api/auth' , auth )
 

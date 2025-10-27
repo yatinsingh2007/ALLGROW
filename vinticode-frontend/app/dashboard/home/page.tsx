@@ -189,9 +189,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         return;
       }
       try {
-        const resp = await api.get(`/dashboard/home?offset=${(page-1) * 9}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resp = await api.get(`/dashboard/home?offset=${(page-1) * 9}`);
         setData(resp.data);
       } catch (err) {
         console.error(err);

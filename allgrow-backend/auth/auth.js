@@ -105,9 +105,13 @@ auth.post('/login' , async (req , res) => {
             id : ourUser.id ,
         } , process.env.JWT_SECRET , { expiresIn : '7d' })
 
-        return res.status(200).json({
+        return res.status(200).cookie("token", token , {
+            httpOnly : true ,
+            secure : true ,
+            sameSite : 'none' ,
+            maxAge: 3 * 24 * 60 * 60 * 1000
+        }).json({
             message : "Login successful" ,
-            token : token
         })
 
     }catch(err){
