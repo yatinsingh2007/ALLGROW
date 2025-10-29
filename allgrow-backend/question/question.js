@@ -137,6 +137,9 @@ question.get('/submissions/:id' , async (req , res) => {
            } ,
            include : {
             question : true
+           } ,
+           orderBy : {
+            createdAt : 'asc'
            }
         })
         return res.status(200).json({

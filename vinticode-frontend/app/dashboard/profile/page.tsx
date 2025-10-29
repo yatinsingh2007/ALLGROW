@@ -4,29 +4,51 @@ import { useEffect, useState } from "react";
 import { ProtectedRouteProvider } from "@/context/ProtectedRoute";
 import api from '@/lib/axios';
 
-interface HeatmapValue {
-  date: string; // 'YYYY-MM-DD'
-  count: number;
+interface Submission{
+  id : string;
+  userId : string;
+  questionId : string;
+  code : string;
+  status : "accepted" | "rejected";
+  createdAt : Date;
+  updatedAt : Date
 }
 
-export default function Profile() {
-  const [values, setValues] = useState<HeatmapValue[]>([]);
 
+
+export default function Profile() {
+  const [ submissionData , setSubmissionData ] = useState<Submission[]>([])
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await api.get<HeatmapValue[]>('/userprofile/heat-map-details');
-        setValues(response.data);
-      } catch (err) {
-        console.error("Failed to fetch heatmap data:", err);
+    (async() => {
+      try{
+        const resp = await api.get('/userprofile' , {
+          withCredentials : true
+        })
+      }catch(err){
+        console.log(err);
       }
-    })();
-  }, []);
+    })()
+  } , [])
+  useEffect(() => {
+    (async()=> {
+      try{
+      const resp = await api.get('' , {
+        withCredentials : true
+      })
+      console.log(resp.data)
+      }catch(err){
+        console.log(err);
+      }
+    })()
+  } , [])
 
   return (
     <ProtectedRouteProvider>
       <main className="p-4">
-        <h1 className="text-xl font-semibold mb-4 text-white">Your Streak</h1>
+
+
+        <h3>Your Submissions</h3>
+        
       </main>
     </ProtectedRouteProvider>
   );

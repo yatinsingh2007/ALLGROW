@@ -4,19 +4,20 @@ const profile = express.Router();
 
 profile.get("/submissions", async (req, res) => {
   try {
-    const ourUser = req.user;
-    const data = await prisma.submissions.findMany({
+    const rawSubmissionData = await prisma.submissions.findMany({
       where: {
-        userId: ourUser.id,
-      },
-      include: {
-        question: true,
+        userId: req.user.id,
       },
       orderBy: {
         createdAt: "desc",
       },
     });
-    return res.status(200).json(data);
+
+    console.log(rawSubmissionData);
+    const refinedSubmissionData = rawSubmissionData.map((submission) => {
+      return { ...submission, createdAt: Date(submission.createdAt) };
+    });
+    return res.status(200).json(refinedSubmissionData);
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -25,24 +26,40 @@ profile.get("/submissions", async (req, res) => {
   }
 });
 
-profile.get("/heat-map-details", async (req, res) => {
+profile.get("/count-of-submittedQuestions", async (req, res) => {
   try {
-    const id = req.user.id;
-    const result = await prisma.$queryRaw`
-        select
-            date(createdAt) as date ,
-            count(*) as count
-        from submissions
-        where userId = ${id}
-        group by date(createdAt)
-        order by date(createdAt) asc`;
+    const data = await prisma.submissions.findMany({
+      where: {
+        userId: req.user.id,
+        status: "accepted",
+      },
+      distinct: ["questionId"],
+      include: {
+        question: true,
+      },
+    });
 
-    const formatted = result.map((r) => ({
-      date: r.date,
-      count: Number(r.count),
-    }));
+    let totalData = await prisma.$queryRaw`
+    select
+      difficulty ,
+      count(*) as total_count
+    from Questions
+    group by difficulty;`;
 
-    return res.json(formatted);
+    totalData = totalData.map((data) => {
+      return { ...data, total_count: Number(data.total_count) };
+    });
+
+    const respData = data.reduce((acc, curr) => {
+      if (acc[curr.question.difficulty]) {
+        acc[curr.question.difficulty] += 1;
+      } else {
+        acc[curr.question.difficulty] = 1;
+      }
+      return acc;
+    }, {});
+
+    return res.status(200).json([...totalData, respData]);
   } catch (err) {
     console.log(err);
     return res.status(500).json({
