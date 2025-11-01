@@ -8,14 +8,15 @@ profile.get("/submissions", async (req, res) => {
       where: {
         userId: req.user.id,
       },
+      include : {
+        question : true
+      },
       orderBy: {
         createdAt: "desc",
-      },
+      }
     });
-
-    console.log(rawSubmissionData);
     const refinedSubmissionData = rawSubmissionData.map((submission) => {
-      return { ...submission, createdAt: Date(submission.createdAt) };
+      return { ...submission, createdAt: submission.createdAt.toISOString() };
     });
     return res.status(200).json(refinedSubmissionData);
   } catch (err) {
@@ -67,5 +68,28 @@ profile.get("/count-of-submittedQuestions", async (req, res) => {
     });
   }
 });
+
+profile.get('/' , async (req , res) => {
+  try{
+    const data = await prisma.user.findUnique({
+      where : {
+        id : req.user.id 
+      }
+    })
+
+    if (!data){
+      return res.status(404).json({
+        "error" : "user not found"
+      })
+    }
+
+    return res.status(200).json(data);
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({
+      "error" : "Internal Server Error"
+    })
+  }
+})
 
 module.exports = { profile };

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { Logo, LogoIcon } from "@/components/Logo";
 import { CheckCircle2 } from "lucide-react";
@@ -12,13 +12,8 @@ import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import {
-  ProtectedRouteProvider,
-  ProtectedRouteContext,
-} from "@/context/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardPagination from "@/section/Pagination";
-import {} from "@/components/ui/select"
 
 interface TestCases {
   sample_input: string[];
@@ -36,30 +31,21 @@ interface Question {
   difficulty: string;
   createdAt: Date;
   updatedAt: Date;
-  done : false
+  done: boolean;
 }
 
 export default function SidebarDemo() {
-  return (
-    <ProtectedRouteProvider>
-      <SidebarDemoInner />
-    </ProtectedRouteProvider>
-  );
+  return <SidebarDemoInner />;
 }
 
 function SidebarDemoInner() {
-  const { isAuthenticated , token , Authloading } = useContext(ProtectedRouteContext)!;
   const [data, setData] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  useEffect(() => {
-   if (Authloading) return;
-   if (!isAuthenticated) {
-     router.push("/auth");
-     toast.error("Please login to access the dashboard");
-   }
-  }, [isAuthenticated , Authloading]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+
   const links = [
     {
       label: "Dashboard",
@@ -77,6 +63,17 @@ function SidebarDemoInner() {
       icon: <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-300" />,
     },
   ];
+
+  // ✅ Load token from cookie/localStorage
+  useEffect(() => {
+    const storedToken =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (storedToken) {
+      setIsAuthenticated(true);
+      setToken(storedToken);
+    }
+    setLoading(false);
+  }, []);
 
   return (
     <div
@@ -106,7 +103,7 @@ function SidebarDemoInner() {
                             router.push("/");
                           }}
                         >
-                          <SidebarLink link={link} key={idx} />
+                          <SidebarLink link={link} />
                         </div>
                       );
                     }
@@ -178,27 +175,28 @@ const Dashboard: React.FC<DashboardProps> = ({
   setData,
   setLoading,
   isAuthenticated,
-  token
+  token,
 }) => {
   const [page, setPage] = useState<number>(1);
   const router = useRouter();
 
   useEffect(() => {
     (async () => {
-      if (!isAuthenticated || !token) {
-        return;
-      }
+      if (!isAuthenticated || !token) return;
+
       try {
-        const resp = await api.get(`/dashboard/home?offset=${(page-1) * 9}`);
+        const resp = await api.get(`/dashboard/home?offset=${(page - 1) * 9}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setData(resp.data);
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch data");
-      }finally{
+      } finally {
         setLoading(false);
       }
     })();
-  }, [isAuthenticated, token, page]);
+  }, [isAuthenticated, token, page, setData, setLoading]);
 
   return (
     <div className="flex flex-1">
@@ -215,7 +213,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                 }}
               >
                 <div className="relative">
-                  {q.done && <CheckCircle2 className="text-green-500 w-5 h-5 mb-1 absolute top-1 right-1" />}
+                  {q.done && (
+                    <CheckCircle2 className="text-green-500 w-5 h-5 mb-1 absolute top-1 right-1" />
+                  )}
                   <h2 className="mb-2 text-lg font-semibold text-white">
                     {q.title}
                   </h2>

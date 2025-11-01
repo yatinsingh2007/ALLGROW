@@ -4,7 +4,6 @@ import Editor, { OnChange } from "@monaco-editor/react";
 import { useParams } from "next/navigation";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useEffect, useState } from "react";
-import { ProtectedRouteProvider } from "@/context/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/axios";
 import {
@@ -211,7 +210,6 @@ export default function Dashboard() {
   const router = useRouter();
 
   return (
-    <ProtectedRouteProvider>
       <PanelGroup direction="horizontal">
         <Panel defaultSize={40}>
           <Button
@@ -390,6 +388,5 @@ export default function Dashboard() {
           </PanelGroup>
         </Panel>
       </PanelGroup>
-    </ProtectedRouteProvider>
   );
 }
