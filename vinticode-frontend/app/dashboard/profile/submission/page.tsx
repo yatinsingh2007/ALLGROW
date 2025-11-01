@@ -1,6 +1,5 @@
 "use client"
 import { Editor } from "@monaco-editor/react"
-import { useEffect } from "react"
 interface props{
     code : string
 }
