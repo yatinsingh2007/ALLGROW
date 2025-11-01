@@ -1,8 +1,10 @@
 "use client"
 import { Editor } from "@monaco-editor/react"
 import { useEffect } from "react"
-
-export default function Submission({ code } : { code : string }){
+interface props{
+    code : string
+}
+export default function Submission({ code } : props){
     return (
         <>
             <Editor
