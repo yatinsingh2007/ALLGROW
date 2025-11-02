@@ -174,6 +174,7 @@ export default function Profile() {
                 <div
                   key={s.id}
                   className="bg-slate-700 p-4 rounded-xl flex justify-between items-center hover:bg-slate-600 transition-all"
+                  onClick={() => router.push(`/dashboard/profile/submission/${s.id}`)}
                 >
                   <div className="flex items-center gap-2">
                     {s.status === "accepted" ? (

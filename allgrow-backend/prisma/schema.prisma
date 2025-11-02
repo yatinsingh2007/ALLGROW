@@ -8,18 +8,18 @@ generator client {
 }
 
 model User {
-  id              String            @id @default(uuid())
+  id              String        @id @default(uuid())
   name            String
-  email           String            @unique
+  email           String        @unique
   password        String
   solvedQuestions Submissions[] @relation("UserSolved")
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Questions {
-  id              String            @id @default(uuid())
-  title           String            @unique
+  id              String        @id @default(uuid())
+  title           String        @unique
   description     String
   input_format    String
   output_format   String
@@ -27,8 +27,8 @@ model Questions {
   sample_output   String
   test_cases      Json
   difficulty      String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   solvedQuestions Submissions[] @relation("QuestionSolved")
 }
 
@@ -36,6 +36,7 @@ model Submissions {
   id         String    @id @default(uuid())
   userId     String
   questionId String
+  languageId Int
   code       String
   status     Status
   createdAt  DateTime  @default(now())
