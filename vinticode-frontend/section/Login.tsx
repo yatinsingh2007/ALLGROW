@@ -49,7 +49,6 @@ export default function Login() {
     } catch (err) {
       console.error(err);
       if (axios.isAxiosError(err)) {
-        // ✅ Type-safe Axios error access
         return toast.error(err.response?.data?.error || "Login failed");
       }
       return toast.error("An unexpected error occurred");

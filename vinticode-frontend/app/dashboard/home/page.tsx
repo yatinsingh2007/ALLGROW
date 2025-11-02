@@ -64,7 +64,6 @@ function SidebarDemoInner() {
     },
   ];
 
-  // ✅ Load token from cookie/localStorage
   useEffect(() => {
     const storedToken =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -189,7 +188,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           headers: { Authorization: `Bearer ${token}` },
         });
         setData(resp.data);
-      } catch (err) {
+      } catch (err : unknown) {
         console.error(err);
         toast.error("Failed to fetch data");
       } finally {

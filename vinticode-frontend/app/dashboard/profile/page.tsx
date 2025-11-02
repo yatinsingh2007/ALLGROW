@@ -69,7 +69,7 @@ export default function Profile() {
 
         setUserData(profileResp.data);
         setSubmissions(submissionsResp.data);
-      } catch (err) {
+      } catch (err : unknown) {
         console.error(err);
       } finally {
         setLoading(false);
