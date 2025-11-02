@@ -1,9 +1,9 @@
 "use client"
 import { Editor } from "@monaco-editor/react"
-interface props{
+interface Props{
     code : string
 }
-export default function Submission({ code } : props){
+export default function Submission({ code } : Props){
     return (
         <>
             <Editor
