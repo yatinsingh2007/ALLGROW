@@ -23,6 +23,7 @@ interface TestCases {
 interface Question {
   id: string;
   title: string;
+  description: string;
   input_format: string;
   output_format: string;
   sample_input: string;
@@ -88,26 +89,26 @@ function SidebarDemoInner() {
             <div className="mt-8 flex flex-col gap-2">
               {loading
                 ? Array.from({ length: 4 }).map((_, idx) => (
-                    <SidebarShimmer key={idx} />
-                  ))
+                  <SidebarShimmer key={idx} />
+                ))
                 : links.map((link, idx) => {
-                    if (link.label === "Logout") {
-                      return (
-                        <div
-                          key={idx}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            localStorage.removeItem("token");
-                            toast.success("Logged out successfully!");
-                            router.push("/");
-                          }}
-                        >
-                          <SidebarLink link={link} />
-                        </div>
-                      );
-                    }
-                    return <SidebarLink key={idx} link={link} />;
-                  })}
+                  if (link.label === "Logout") {
+                    return (
+                      <div
+                        key={idx}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          localStorage.removeItem("token");
+                          toast.success("Logged out successfully!");
+                          router.push("/");
+                        }}
+                      >
+                        <SidebarLink link={link} />
+                      </div>
+                    );
+                  }
+                  return <SidebarLink key={idx} link={link} />;
+                })}
             </div>
           </div>
         </SidebarBody>
@@ -188,7 +189,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           headers: { Authorization: `Bearer ${token}` },
         });
         setData(resp.data);
-      } catch (err : unknown) {
+      } catch (err: unknown) {
         console.error(err);
         toast.error("Failed to fetch data");
       } finally {
@@ -203,21 +204,25 @@ const Dashboard: React.FC<DashboardProps> = ({
         {loading || data.length === 0
           ? Array.from({ length: 9 }).map((_, idx) => <ShimmerCard key={idx} />)
           : data.map((q) => (
-              <div
-                key={q.id}
-                className="flex flex-col justify-between rounded-2xl border border-neutral-800 bg-neutral-900 p-5 shadow hover:shadow-md transition cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  router.push(`/dashboard/question/${q.id}`);
-                }}
-              >
-                <div className="relative">
-                  {q.done && (
-                    <CheckCircle2 className="text-green-500 w-5 h-5 mb-1 absolute top-1 right-1" />
-                  )}
-                  <h2 className="mb-2 text-lg font-semibold text-white">
-                    {q.title}
-                  </h2>
+            <div
+              key={q.id}
+              className="flex flex-col justify-between rounded-2xl border border-neutral-800 bg-neutral-900 p-5 shadow hover:shadow-md transition cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push(`/dashboard/question/${q.id}`);
+              }}
+            >
+              <div className="relative">
+                {q.done && (
+                  <CheckCircle2 className="text-green-500 w-5 h-5 mb-1 absolute top-1 right-1" />
+                )}
+                <h4 className="mb-2 text-lg font-semibold text-white">
+                  {q.title}
+                </h4>
+                <p className="mb-2 text-sm font-semibold text-white">
+                  Description: {q.description}
+                </p>
+                <div className="mt-8">
                   <p className="text-sm text-neutral-400 line-clamp-2">
                     Input: {q.input_format}
                   </p>
@@ -225,17 +230,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                     Output: {q.output_format}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                      q.difficulty
-                    )}`}
-                  >
-                    {q.difficulty}
-                  </span>
-                </div>
               </div>
-            ))}
+              <div className="mt-3 flex items-center justify-between">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
+                    q.difficulty
+                  )}`}
+                >
+                  {q.difficulty}
+                </span>
+              </div>
+            </div>
+          ))}
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
           <DashboardPagination
             totalPages={10}

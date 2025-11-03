@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 const { prisma } = require('../prisma/prismaClient');
+const { checkUserAuthentication } = require('../middleware/middleware');
 
 require('dotenv').config();
 
@@ -118,6 +119,21 @@ auth.post('/login' , async (req , res) => {
         return res.status(500).json(
             { error: "Internal Server Error" }
         )
+    }
+})
+
+auth.get('/logout' , checkUserAuthentication , async (req , res) => {
+    try{
+        return res.cookie("token" , null , {
+            expires : new Date(Date.now())
+        }).status(200).json({
+            "message" : "User LoggedOut Successfully"
+        })
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            "error" : "Internal Server Error"
+        })
     }
 })
 

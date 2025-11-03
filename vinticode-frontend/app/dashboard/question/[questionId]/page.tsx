@@ -22,7 +22,10 @@ interface languageDetails {
   language: string;
   id: number;
 }
-
+interface TestCases{
+ input : string;
+ output : string;
+}
 interface questionData {
   id: string;
   title: string;
@@ -31,12 +34,7 @@ interface questionData {
   output_format: string;
   sample_input: string;
   sample_output: string;
-  test_cases: [
-    {
-      input: string;
-      output: string;
-    }
-  ];
+  test_cases: TestCases[];
   difficulty: string;
   createdAt: Date;
   updatedAt: Date;
@@ -99,6 +97,7 @@ export default function Dashboard() {
     done : false
   });
 
+
   useEffect(() => {
     (async () => {
       try {
@@ -115,6 +114,19 @@ export default function Dashboard() {
       }
     })();
   }, [questionId]);
+    
+  useEffect(() => {
+    (async() => {
+      try{  
+        const resp = await api.get(`/questions/latestSubmission/${questionId}` , {
+          withCredentials : true
+        })
+        setCode(resp.data?.code)
+      }catch(err : unknown){
+        console.log(err);
+      }
+    })();
+  } , [])
 
   const [language, setLanguage] = useState<languageDetails>({
     language: "python",

@@ -171,4 +171,27 @@ question.get('/submission/:id' , async (req , res) => {
     }
 })
 
+question.get('/latestSubmission/:id' , async (req , res) => {
+    try{
+        const { id } = req.params;
+        const latestSubmission = await prisma.submissions.findUnique({
+            where : {
+                questionId : id
+            } ,
+            orderBy : {
+                createdAt : 'desc'
+            }
+        })
+        if (!latestSubmission) return res.status(404).json({
+            "error" : "Submission not Found"
+        })
+        return res.status(200).json(latestSubmission)
+    }catch(err){
+        console.log(err);
+        return res.status(500).json({
+            "error" : "Internal Server Error"
+        })
+    }
+})
+
 module.exports = { question }
