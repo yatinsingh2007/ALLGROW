@@ -60,6 +60,7 @@ question.post('/submitCode/:id' , async (req , res) => {
                 },
                 {
                 headers : {
+                    "Content-Type" : "application/json",
                     "X-RapidAPI-Host": JSON.parse(process.env[`USER_${randomInt}`])['x-rapidapi-host'],
                     "X-RapidAPI-Key": JSON.parse(process.env[`USER_${randomInt}`])['x-rapidapi-key']
             }
