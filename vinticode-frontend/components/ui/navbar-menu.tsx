@@ -2,6 +2,8 @@
 import React from "react";
 import { motion , type Transition } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const transition : Transition= {
   type: "spring",
@@ -17,20 +19,36 @@ export const MenuItem = ({
   active,
   item,
   children,
+  href,
 }: {
   setActive: (item: string) => void;
   active: string | null;
   item: string;
   children?: React.ReactNode;
+  href?: string;
 }) => {
+  const pathname = usePathname();
+  const isActive = href ? pathname === href : false;
   return (
-    <div onMouseEnter={() => setActive(item)} className="relative">
-      <motion.p
-        transition={{ duration: 0.3 }}
-        className="cursor-pointer text-white hover:opacity-[0.9]"
-      >
-        {item}
-      </motion.p>
+    <div onMouseEnter={() => setActive(item)} onFocus={() => setActive(item)} className="relative">
+      {href ? (
+        <Link href={href} className="outline-none">
+          <motion.span
+            transition={{ duration: 0.3 }}
+            className={`cursor-pointer hover:opacity-[0.9] focus:opacity-[0.9] ${isActive ? "text-blue-400" : "text-white"}`}
+          >
+            {item}
+          </motion.span>
+        </Link>
+      ) : (
+        <motion.span
+          transition={{ duration: 0.3 }}
+          className="cursor-pointer text-white hover:opacity-[0.9] focus:opacity-[0.9] outline-none"
+          tabIndex={0}
+        >
+          {item}
+        </motion.span>
+      )}
       {active !== null && (
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: 10 }}
@@ -66,7 +84,9 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)}
-      className="relative rounded-full border-transparent dark:bg-black dark:border-white/[0.2] bg-transparent shadow-input flex justify-center space-x-4 px-8 py-6 border-2 border-b-blue-900"
+      className="relative rounded-full border-transparent bg-transparent shadow-input flex justify-center space-x-6 px-8 py-4 border-2 border-b-blue-900"
+      role="navigation"
+      aria-label="Main"
     >
       {children}
     </nav>
