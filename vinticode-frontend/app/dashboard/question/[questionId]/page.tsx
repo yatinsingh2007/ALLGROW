@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 
 interface languageDetails {
   language: string;
@@ -55,27 +56,10 @@ interface Output {
   };
 }
 
-interface Submission {
-  id: string | null;
-  userId: string | null;
-  questionId: string | null;
-  code: string | null;
-  status: "accepted" | "rejected" | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  question: questionData;
-}
-
-interface Submissions {
-  submissions: Submission[];
-}
+// (reserved) Submission interface for future submission views
 
 export default function Dashboard() {
   const { questionId } = useParams();
-
-  const [submissions, setSubmissions] = useState<Submissions>({
-    submissions: [],
-  });
 
   const [questionData, setQuestionData] = useState<questionData>({
     id: "",
@@ -101,11 +85,8 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const token = localStorage.getItem("token") || "";
         const resp = await api.get(`/dashboard/question/${questionId}`, {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
+          withCredentials : true
         });
         setQuestionData(resp.data);
       } catch (err) {
@@ -126,7 +107,7 @@ export default function Dashboard() {
         console.log(err);
       }
     })();
-  } , [])
+  } , [questionId])
 
   const [language, setLanguage] = useState<languageDetails>({
     language: "python",
@@ -224,52 +205,96 @@ export default function Dashboard() {
   return (
       <PanelGroup direction="horizontal">
         <Panel defaultSize={40}>
-          <Button
-            className="fixed top-2 left-2 bg-black text-white hover:bg-white hover:text-black cursor-pointer"
-            onClick={() => router.push("/dashboard/home")}
-          >
-            Back
-          </Button>
-          <div className="p-6 text-white overflow-y-auto h-screen bg-[#111] pt-14">
+          <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-800 bg-[#111]/90 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-[#111]/70">
+            <Button
+              variant="ghost"
+              className="h-9 gap-2 rounded-md border border-neutral-800 bg-neutral-900/50 px-3 text-neutral-200 hover:bg-neutral-800"
+              onClick={() => router.push("/dashboard/home")}
+            >
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Button>
+            {questionData.title && (
+              <div className="ml-1 flex items-center gap-2">
+                <h1 className="text-base font-semibold text-white md:text-lg line-clamp-1">{questionData.title}</h1>
+                {questionData.done && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-green-900/60 px-2 py-0.5 text-[10px] font-medium text-green-200 ring-1 ring-inset ring-green-800">
+                    <CheckCircle2 className="h-3 w-3" /> Done
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="p-6 text-white overflow-y-auto h-[calc(100vh-48px)] bg-[#111]">
             {questionData.title ? (
               <>
-                <h1 className="text-2xl font-bold mb-2">
-                  {questionData.title}
-                </h1>
-                <div
-                  className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${questionData.difficulty === "Easy"
-                      ? "bg-green-600/20 text-green-400"
+                <div className="mb-4">
+                  <span
+                    className={`${questionData.difficulty === "Easy"
+                      ? "bg-green-900 text-green-200"
                       : questionData.difficulty === "Medium"
-                        ? "bg-yellow-600/20 text-yellow-400"
-                        : "bg-red-600/20 text-red-400"
-                    }`}
-                >
-                  {questionData.difficulty}
+                      ? "bg-yellow-900 text-yellow-200"
+                      : "bg-red-900 text-red-200"} inline-flex rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ring-white/10`}
+                  >
+                    {questionData.difficulty}
+                  </span>
                 </div>
 
-                <p className="text-gray-300 leading-relaxed mb-4">
-                  {questionData.description}
-                </p>
+                <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4">
+                  <h3 className="text-base font-semibold text-white">Description</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-300">
+                    {questionData.description}
+                  </p>
+                </div>
 
-                <h3 className="text-lg font-semibold mt-2">Input Format:</h3>
-                <pre className="text-gray-400 whitespace-pre-wrap mb-3">
-                  {questionData.input_format}
-                </pre>
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-white">Input Format</h3>
+                    </div>
+                    <pre className="text-xs text-neutral-300 whitespace-pre-wrap">{questionData.input_format}</pre>
+                  </div>
+                  <div className="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-white">Output Format</h3>
+                    </div>
+                    <pre className="text-xs text-neutral-300 whitespace-pre-wrap">{questionData.output_format}</pre>
+                  </div>
+                </div>
 
-                <h3 className="text-lg font-semibold">Output Format:</h3>
-                <pre className="text-gray-400 whitespace-pre-wrap mb-3">
-                  {questionData.output_format}
-                </pre>
-
-                <h3 className="text-lg font-semibold">Sample Input:</h3>
-                <pre className="bg-[#1a1a1a] p-3 rounded-md mb-3">
-                  {questionData.sample_input}
-                </pre>
-
-                <h3 className="text-lg font-semibold">Sample Output:</h3>
-                <pre className="bg-[#1a1a1a] p-3 rounded-md">
-                  {questionData.sample_output}
-                </pre>
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-white">Sample Input</h3>
+                      <Button
+                        variant="ghost"
+                        className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200 hover:bg-neutral-700"
+                        onClick={() => {
+                          navigator.clipboard.writeText(questionData.sample_input || "");
+                          toast.success("Sample input copied");
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                    <pre className="rounded-md bg-[#1a1a1a] p-3 text-xs text-neutral-200">{questionData.sample_input}</pre>
+                  </div>
+                  <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-white">Sample Output</h3>
+                      <Button
+                        variant="ghost"
+                        className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200 hover:bg-neutral-700"
+                        onClick={() => {
+                          navigator.clipboard.writeText(questionData.sample_output || "");
+                          toast.success("Sample output copied");
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                    <pre className="rounded-md bg-[#1a1a1a] p-3 text-xs text-neutral-200">{questionData.sample_output}</pre>
+                  </div>
+                </div>
               </>
             ) : (
               <div className="space-y-4">
@@ -338,10 +363,11 @@ export default function Dashboard() {
                   <div className="flex gap-3">
                     <Button
                       onClick={handleRun}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                      disabled={rloader}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-70"
                     >
                       {rloader ? (
-                        <div className="h-6 w-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span className="inline-flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />Running</span>
                       ) : (
                         "Run"
                       )}
@@ -349,10 +375,11 @@ export default function Dashboard() {
 
                     <Button
                       onClick={handleSubmit}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                      disabled={sloader}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-70"
                     >
                       {sloader ? (
-                        <div className="h-6 w-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span className="inline-flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />Submitting</span>
                       ) : (
                         "Submit"
                       )}
@@ -379,9 +406,16 @@ export default function Dashboard() {
             <Panel defaultSize={30}>
               <div className="h-full bg-black border-t border-gray-700 flex flex-col">
                 <div className="p-3 border-b border-gray-700">
-                  <label className="block text-gray-400 mb-1">
-                    Custom Input:
-                  </label>
+                  <div className="mb-1 flex items-center justify-between">
+                    <label className="text-gray-400">Custom Input</label>
+                    <Button
+                      variant="ghost"
+                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200 hover:bg-neutral-700"
+                      onClick={() => setCustomInput("")}
+                    >
+                      Clear
+                    </Button>
+                  </div>
                   <textarea
                     value={customInput}
                     onChange={(e) => setCustomInput(e.target.value)}
@@ -391,9 +425,28 @@ export default function Dashboard() {
                   />
                 </div>
 
-                <div className="flex-1 p-3 text-green-400 font-mono text-sm overflow-auto">
-                  <label className="block text-gray-400 mb-1">Output:</label>
-                  <pre>{output.stdout || "Output will appear here..."}</pre>
+                <div className="flex-1 p-3 font-mono text-sm overflow-auto">
+                  <div className="mb-1 flex items-center justify-between">
+                    <label className="text-gray-400">Output</label>
+                    <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] text-neutral-300 ring-1 ring-inset ring-neutral-700">
+                      {output?.status?.description || "Idle"}
+                    </span>
+                  </div>
+                  <pre className="text-green-400 whitespace-pre-wrap">
+                    {output.stdout || "Output will appear here..."}
+                  </pre>
+                  {output.stderr && (
+                    <div className="mt-2">
+                      <div className="text-red-400">Stderr</div>
+                      <pre className="text-red-400 whitespace-pre-wrap">{output.stderr}</pre>
+                    </div>
+                  )}
+                  {output.compile_output && (
+                    <div className="mt-2">
+                      <div className="text-yellow-300">Compiler</div>
+                      <pre className="text-yellow-300 whitespace-pre-wrap">{output.compile_output}</pre>
+                    </div>
+                  )}
                 </div>
               </div>
             </Panel>

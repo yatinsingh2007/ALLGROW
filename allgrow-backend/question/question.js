@@ -49,8 +49,9 @@ question.post('/submitCode/:id' , async (req , res) => {
                 "error" : "Question Not Found"
             })
         }
+        const testCases = JSON.parse(questionData.test_cases)
 
-        const response = Promise.all(questionData.test_cases.map( async (testCase) => {
+        const response = Promise.all(testCases.map( async (testCase) => {
             try{
                 const res = await api.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true" , {
                 source_code : code,
@@ -88,6 +89,7 @@ question.post('/submitCode/:id' , async (req , res) => {
                             userId : req.user.id ,
                             questionId : id ,
                             status : `rejected`,
+                            languageId : language_id,
                             code : code
                         }
                     })
@@ -108,7 +110,8 @@ question.post('/submitCode/:id' , async (req , res) => {
                         create : {
                     questionId : id ,
                     status : "accepted" ,
-                    code : code
+                    code : code ,
+                    languageId : language_id
                 }
                     }
                 }
@@ -175,7 +178,7 @@ question.get('/submission/:id' , async (req , res) => {
 question.get('/latestSubmission/:id' , async (req , res) => {
     try{
         const { id } = req.params;
-        const latestSubmission = await prisma.submissions.findUnique({
+        const latestSubmission = await prisma.submissions.findFirst({
             where : {
                 questionId : id
             } ,
