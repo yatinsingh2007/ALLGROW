@@ -62,6 +62,7 @@ auth.post('/register' , async (req , res) => {
                 { error: "Email already in use" }
             );
         }
+        console.log(err)
         return res.status(500).json(
             { error: "Internal Server Error" }
         );
@@ -116,6 +117,7 @@ auth.post('/login' , async (req , res) => {
         })
 
     }catch(err){
+        console.log(err)
         return res.status(500).json(
             { error: "Internal Server Error" }
         )
