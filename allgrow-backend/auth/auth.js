@@ -120,7 +120,7 @@ auth.get("/logout", checkUserAuthentication, async (req, res) => {
         expires: new Date(Date.now()),
         httpOnly: true,
         secure: true,
-        sameSite: "lax",
+        sameSite: "none",
       })
       .status(200)
       .json({
