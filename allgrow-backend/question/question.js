@@ -49,8 +49,7 @@ question.post('/submitCode/:id' , async (req , res) => {
                 "error" : "Question Not Found"
             })
         }
-        const testCases = JSON.parse(questionData.test_cases)
-
+        const testCases = questionData.test_cases
         const response = Promise.all(testCases.map( async (testCase) => {
             try{
                 const res = await api.post("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true" , {
