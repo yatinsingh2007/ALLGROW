@@ -110,7 +110,7 @@ auth.post('/login' , async (req , res) => {
         return res.status(200).cookie("token", token , {
             httpOnly : true ,
             secure : true ,
-            sameSite : 'none' ,
+            sameSite : 'strict' ,
             maxAge: 3 * 24 * 60 * 60 * 1000
         }).json({
             message : "Login successful" ,
