@@ -17,7 +17,6 @@ app.use(cors({
     `http://localhost:${FRONTEND_PORT}`,
     'https://vinticode.vercel.app'
   ],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
 }));
 
