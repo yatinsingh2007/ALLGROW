@@ -107,6 +107,8 @@ auth.post('/login' , async (req , res) => {
             id : ourUser.id ,
         } , process.env.JWT_SECRET , { expiresIn : '7d' })
 
+        console.log(token)
+
         return res.cookie("token", token , {
             httpOnly : true ,
             secure : true ,
