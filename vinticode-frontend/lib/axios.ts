@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL : "http://localhost:7777/api" ,
+    baseURL : "https://vinti-code.vercel.app/api" ,
     withCredentials : true
 })
 
