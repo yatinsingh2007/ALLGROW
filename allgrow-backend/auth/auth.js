@@ -1,148 +1,137 @@
-const express = require('express');
+const express = require("express");
 
-const  validator = require('validator')
+const validator = require("validator");
 
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const { prisma } = require('../prisma/prismaClient');
-const { checkUserAuthentication } = require('../middleware/middleware');
+const { prisma } = require("../prisma/prismaClient");
+const { checkUserAuthentication } = require("../middleware/middleware");
 
-require('dotenv').config();
+require("dotenv").config();
 
 const auth = express.Router();
 
 auth.use(express.json());
 
-auth.post('/register' , async (req , res) => {
-    let { name , email , password } = req.body;
+auth.post("/register", async (req, res) => {
+  let { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(400).json(
-            { error: "Name, email, and password are required" }
-        );
+  if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ error: "Name, email, and password are required" });
+  }
+
+  name = name.trim();
+  email = email.trim();
+  password = password.trim();
+  if (name.length < 3) {
+    return res
+      .status(400)
+      .json({ error: "Name must be at least 3 characters long" });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  if (!validator.isStrongPassword(password)) {
+    return res.status(400).json({ error: "Password is not strong enough" });
+  }
+
+  password = await bcrypt.hash(password, 10);
+  try {
+    await prisma.user.create({
+      data: {
+        name,
+        email,
+        password,
+      },
+    });
+    return res.status(201).send("User registered successfully");
+  } catch (err) {
+    if (err.code === "P2002") {
+      return res.status(409).json({ error: "Email already in use" });
+    }
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+auth.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  try {
+    const ourUser = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!ourUser) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    name = name.trim();
-    email = email.trim();
-    password = password.trim();
-    if (name.length < 3){
-        return res.status(400).json(
-            { error: "Name must be at least 3 characters long" }
-        );
+    const compare = await bcrypt.compare(password, ourUser.password);
+    if (!compare) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
+    const token = jwt.sign(
+      {
+        id: ourUser.id,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    if (!validator.isEmail(email)) {
-        return res.status(400).json(
-            { error: "Invalid email format" }
-        );
-    }
+    console.log(token);
 
-    if (!validator.isStrongPassword(password)){
-        return res.status(400).json(
-            { error: "Password is not strong enough" }
-        );
-    }
+    return res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({
+        message: "Login successful",
+      });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
-    password = await bcrypt.hash(password , 10)
-    try {
-        await prisma.user.create({
-            data : {
-                name ,
-                email ,
-                password
-            }
-        })
-        return res.status(201).send("User registered successfully");
-    }catch(err){
-        if (err.code === 'P2002'){
-            return res.status(409).json(
-                { error: "Email already in use" }
-            );
-        }
-        console.log(err)
-        return res.status(500).json(
-            { error: "Internal Server Error" }
-        );
-    }
-})
+auth.get("/logout", checkUserAuthentication, async (req, res) => {
+  try {
+    return res
+      .cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+      })
+      .status(200)
+      .json({
+        message: "User LoggedOut Successfully",
+      });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+});
 
-auth.post('/login' , async (req , res) => {
-    const { email , password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json(
-            { error: "Email and password are required" }
-        );
-    }
-
-    if (!validator.isEmail(email)) {
-        return res.status(400).json(
-            { error: "Invalid email format" }
-        );
-    }
-
-    try {
-        const ourUser = await prisma.user.findUnique({
-            where : {
-                email
-            }
-        })
-        if (!ourUser){
-            return res.status(404).json(
-                { error: "User not found" }
-            );
-        }
-
-        const compare = await bcrypt.compare(password , ourUser.password)
-        if (!compare){
-            return res.status(401).json(
-                { error: "Invalid credentials" }
-            );
-        }
-
-        const token = jwt.sign({
-            id : ourUser.id ,
-        } , process.env.JWT_SECRET , { expiresIn : '7d' })
-
-        console.log(token)
-
-        return res.cookie("token", token , {
-            httpOnly : true ,
-            secure : true ,
-            sameSite : 'lax' ,
-            maxAge: 3 * 24 * 60 * 60 * 1000
-        }).status(200).json({
-            message : "Login successful" ,
-        })
-
-    }catch(err){
-        console.log(err)
-        return res.status(500).json(
-            { error: "Internal Server Error" }
-        )
-    }
-})
-
-auth.get('/logout' , checkUserAuthentication , async (req , res) => {
-    try{
-        return res.cookie("token" , null , {
-            expires : new Date(Date.now()) ,
-            httpOnly : true ,
-            secure : true ,
-            sameSite : 'lax'
-        }).status(200).json({
-            "message" : "User LoggedOut Successfully"
-        })
-    }catch(err){
-        console.log(err);
-        return res.status(500).json({
-            "error" : "Internal Server Error"
-        })
-    }
-})
-
-
-module.exports = { auth }
+module.exports = { auth };
