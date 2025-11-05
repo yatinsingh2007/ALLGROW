@@ -8,45 +8,51 @@ const { auth } = require('./auth/auth');
 const { question } = require('./question/question');
 const { checkUserAuthentication } = require('./middleware/middleware');
 const { profile } = require('./profile/profile');
+
 const app = express();
-const PORT = process.env.FRONTEND_PORT
+const FRONTEND_PORT = process.env.FRONTEND_PORT || 3000;
 
 app.use(cors({
-    origin : [
-        `http://localhost:${PORT}`,
-        'https://vinticode.vercel.app'
-    ] ,
-    methods : ['GET' , 'POST' , 'PUT' , 'PATCH' , 'DELETE'],
-    credentials : true
+  origin: [
+    `http://localhost:${FRONTEND_PORT}`,
+    'https://vinticode.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  credentials: true
 }));
 
-
 app.use(express.json());
-
-app.use(cookieParser())
-
-app.use('/api/auth' , auth )
-
-app.use('/api/dashboard' , checkUserAuthentication , dashboard)
-
-app.use('/api/questions' , checkUserAuthentication , question)
-
-app.use('/api/userprofile' , checkUserAuthentication , profile)
+app.use(cookieParser());
 
 
-async function main(){
-    await prisma.$connect();
-    console.log("Connected to the database");
+app.use('/api/auth', auth);
+app.use('/api/dashboard', checkUserAuthentication, dashboard);
+app.use('/api/questions', checkUserAuthentication, question);
+app.use('/api/userprofile', checkUserAuthentication, profile);
 
-    app.listen(process.env.PORT || 5000 , () => {
-        console.log(`Server is running on port ${process.env.PORT}`);
-    })
+
+app.get('/', (req, res) => {
+  res.send('Backend is running successfully on Vercel!');
+});
+
+
+module.exports = app;
+
+
+if (process.env.NODE_ENV !== 'production') {
+  async function main() {
+    try {
+      await prisma.$connect();
+      console.log('Connected to the database');
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`Server running locally on port ${PORT}`);
+      });
+    } catch (e) {
+      console.error(e);
+      await prisma.$disconnect();
+    }
+  }
+
+  main();
 }
-
-main()
-.catch((e) => {
-    console.error(e);
-}).finally(async () => {
-    await prisma.$disconnect();
-})
-module.exports = { app }
