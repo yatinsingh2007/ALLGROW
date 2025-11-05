@@ -112,7 +112,7 @@ auth.post('/login' , async (req , res) => {
         return res.cookie("token", token , {
             httpOnly : true ,
             secure : true ,
-            sameSite : 'none' ,
+            sameSite : 'lax' ,
             maxAge: 3 * 24 * 60 * 60 * 1000
         }).status(200).json({
             message : "Login successful" ,
@@ -129,7 +129,10 @@ auth.post('/login' , async (req , res) => {
 auth.get('/logout' , checkUserAuthentication , async (req , res) => {
     try{
         return res.cookie("token" , null , {
-            expires : new Date(Date.now())
+            expires : new Date(Date.now()) ,
+            httpOnly : true ,
+            secure : true ,
+            sameSite : 'lax'
         }).status(200).json({
             "message" : "User LoggedOut Successfully"
         })
