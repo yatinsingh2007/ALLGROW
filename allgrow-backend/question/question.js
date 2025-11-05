@@ -162,7 +162,7 @@ question.get('/submission/:id' , async (req , res) => {
         const { id } = req.params;
         const submissionData = await prisma.submissions.findUnique({
             where : {
-                id : id
+                id : id 
             }
         })
         return res.status(200).json(submissionData);
@@ -179,6 +179,7 @@ question.get('/latestSubmission/:id' , async (req , res) => {
         const { id } = req.params;
         const latestSubmission = await prisma.submissions.findFirst({
             where : {
+                userId : req.user.id ,
                 questionId : id
             } ,
             orderBy : {
