@@ -201,10 +201,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <SelectValue placeholder="Select difficulty" className="text-white" />
                 </SelectTrigger>
                 <SelectContent align="end" className="bg-black text-white">
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="easy">Easy</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="hard">Hard</SelectItem>
+                  <SelectItem value="all" className="text-white">All</SelectItem>
+                  <SelectItem value="easy" className="text-white">Easy</SelectItem>
+                  <SelectItem value="medium" className="text-white">Medium</SelectItem>
+                  <SelectItem value="hard" className="text-white">Hard</SelectItem>
                 </SelectContent>
               </Select>
             </div>
