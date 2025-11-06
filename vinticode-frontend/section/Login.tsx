@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -33,9 +33,11 @@ export default function Login() {
   });
   const [passwordType, setPasswordType] =
     useState<"password" | "text">("password");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await api.post("/auth/login", {
         email: details.email,
@@ -52,6 +54,8 @@ export default function Login() {
         return toast.error(err.response?.data?.error || "Login failed");
       }
       return toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,10 +110,18 @@ export default function Login() {
         </CardContent>
         <CardFooter>
           <Button
-            className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer mt-4"
+            className="w-full bg-white text-black hover:scale-105 hover:bg-white hover:text-black cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             type="submit"
+            disabled={loading}
           >
-            Sign In
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing In...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </CardFooter>
       </form>

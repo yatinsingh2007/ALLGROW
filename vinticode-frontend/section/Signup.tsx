@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ShineBorder } from "@/components/magicui/shine-border";
-import { EyeOff, Eye } from "lucide-react";
+import { EyeOff, Eye, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
@@ -34,6 +34,7 @@ export default function SignupCard() {
   });
   const [passwordType, setPasswordType] =
     useState<"password" | "text">("password");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,6 +43,7 @@ export default function SignupCard() {
       return toast.error("Passwords do not match");
     }
 
+    setLoading(true);
     try {
       await api.post("/auth/register", {
         name: userDetails.name,
@@ -55,6 +57,8 @@ export default function SignupCard() {
         return toast.error(err.response?.data?.error || "Signup failed");
       }
       return toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,10 +167,18 @@ export default function SignupCard() {
         </CardContent>
         <CardFooter>
           <Button
-            className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer mt-4"
+            className="w-full bg-white text-black hover:bg-white hover:text-black hover:scale-105 cursor-pointer mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
+            disabled={loading}
           >
-            Create Account
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating Account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </Button>
         </CardFooter>
       </form>
