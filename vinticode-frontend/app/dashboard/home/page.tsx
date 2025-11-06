@@ -198,9 +198,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-sm text-neutral-300">Difficulty</span>
               <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
                 <SelectTrigger size="default" className="min-w-[140px]">
-                  <SelectValue placeholder="Select difficulty" />
+                  <SelectValue placeholder="Select difficulty" className="text-white" />
                 </SelectTrigger>
-                <SelectContent align="end">
+                <SelectContent align="end" className="bg-black text-white">
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="easy">Easy</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
