@@ -10,7 +10,6 @@ import {
   AlertCircle,
   ArrowLeft,
   Calendar,
-  Trophy,
   FileCode,
   TrendingUp,
 } from "lucide-react";
