@@ -1,9 +1,6 @@
 -- CreateEnum
 CREATE TYPE "public"."Status" AS ENUM ('accepted', 'rejected');
 
--- CreateEnum
-CREATE TYPE "public"."Difficulty" AS ENUM ('easy', 'medium', 'hard');
-
 -- CreateTable
 CREATE TABLE "public"."User" (
     "id" TEXT NOT NULL,
@@ -26,7 +23,7 @@ CREATE TABLE "public"."Questions" (
     "sample_input" TEXT NOT NULL,
     "sample_output" TEXT NOT NULL,
     "test_cases" JSONB NOT NULL,
-    "difficulty" "public"."Difficulty" NOT NULL,
+    "difficulty" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
