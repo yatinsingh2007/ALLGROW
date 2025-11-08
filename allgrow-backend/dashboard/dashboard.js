@@ -6,16 +6,8 @@ const dashboard = express.Router()
 
 
 dashboard.get('/home' , async (req , res) => {
-  let { offset } = req.query;
-  if (!offset){
-    offset = 0;
-  }
   try{
-     const allQuestions = await prisma.questions.findMany({
-        skip : parseInt(offset),
-        take : 9
-     });
-
+     const allQuestions = await prisma.questions.findMany();
      const completedQuestions = await prisma.questions.findMany({
       where : {
         solvedQuestions : {

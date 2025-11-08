@@ -94,8 +94,6 @@ auth.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    console.log(token);
-
     return res
       .cookie("token", token, {
         httpOnly: true,
