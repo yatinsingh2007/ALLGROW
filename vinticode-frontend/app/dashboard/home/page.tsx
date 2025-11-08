@@ -74,7 +74,6 @@ function SidebarDemoInner() {
   return (
     <div
       className={cn(
-        // ✅ FIX: Restored h-screen
         "mx-auto flex w-full h-screen flex-1 flex-col md:flex-row bg-neutral-950 border border-neutral-900"
       )}
     >
@@ -177,7 +176,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   const router = useRouter();
   const itemsPerPage = 9;
 
-  // ✅ Fetch ALL QUESTIONS once
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
@@ -197,7 +195,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     fetchQuestions();
   }, []);
 
-  // ✅ Search & Filter Logic
   useEffect(() => {
     let filtered = [...allQuestions];
 
@@ -225,7 +222,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     if (page > total) setPage(1);
   }, [allQuestions, searchQuery, difficultyFilter]);
 
-  // ✅ Pagination (Slice on each page change)
   useEffect(() => {
     const start = (page - 1) * itemsPerPage;
     const paginated = filteredQuestions.slice(start, start + itemsPerPage);
@@ -284,7 +280,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         )}
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         {loading &&
           Array.from({ length: 9 }).map((_, idx) => <ShimmerCard key={idx} />)}
@@ -337,7 +332,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         )}
       </div>
 
-      {/* Pagination */}
       <div className="border-t border-neutral-800 py-3 px-4">
         <DashboardPagination
           totalPages={totalPages}
