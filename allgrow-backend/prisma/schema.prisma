@@ -27,7 +27,7 @@ model Questions {
   sample_input    String
   sample_output   String
   test_cases      Json
-  difficulty      String
+  difficulty      Difficulty
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   solvedQuestions Submissions[] @relation("QuestionSolved")
@@ -49,4 +49,10 @@ model Submissions {
 enum Status {
   accepted
   rejected
+}
+
+enum Difficulty{
+  easy
+  medium
+  hard
 }
