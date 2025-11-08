@@ -51,7 +51,7 @@ enum Status {
   rejected
 }
 
-enum Difficulty{
+enum Difficulty {
   easy
   medium
   hard
