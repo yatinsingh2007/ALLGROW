@@ -45,12 +45,16 @@ export default function SignupCard() {
 
     setLoading(true);
     try {
-      await api.post("/auth/register", {
+      const resp = await api.post("/auth/register", {
         name: userDetails.name,
         email: userDetails.email,
         password: userDetails.password,
       });
+      if (resp.status !== 201) {
+        return toast.error("Signup failed");
+      }
       toast.success("Account created successfully! Please login.");
+      setUserDetails({ name: "", email: "", password: "", confirmPassword: "" });
     } catch (err) {
       console.error(err);
       if (isAxiosError(err)) {

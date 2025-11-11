@@ -43,11 +43,13 @@ export default function Login() {
         email: details.email,
         password: details.password,
       });
-
-      localStorage.setItem("token", res.data.token);
+      if (res.status !== 200) {
+        return toast.error("Login failed");
+      }
       toast.success("Logged in successfully!");
       router.push("/dashboard/home");
       toast.dismiss();
+      setDetails({ name: "", email: "", password: "" });
     } catch (err) {
       console.error(err);
       if (axios.isAxiosError(err)) {

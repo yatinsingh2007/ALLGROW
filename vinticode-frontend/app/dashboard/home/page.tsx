@@ -185,7 +185,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         setAllQuestions(questions);
         setData(questions);
-      } catch (err) {
+      } catch (err : unknown) {
         toast.error("Failed to fetch data");
       } finally {
         setLoading(false);
