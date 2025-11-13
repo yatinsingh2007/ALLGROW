@@ -63,6 +63,10 @@ export default function Dashboard() {
 
   const [submissionOutput, setSubmissionOutput] = useState<string[]>([]);
 
+  const [testcaseStatus, setTestcaseStatus] = useState<
+    ("pending" | "loading" | "accepted" | "failed")[]
+  >([]);
+
   const [questionData, setQuestionData] = useState<questionData>({
     id: "",
     title: "",
@@ -91,6 +95,12 @@ export default function Dashboard() {
       }
     })();
   }, [questionId]);
+
+  useEffect(() => {
+    if (questionData.test_cases.length > 0) {
+      setTestcaseStatus(questionData.test_cases.map(() => "pending"));
+    }
+  }, [questionData]);
 
   useEffect(() => {
     (async () => {
@@ -156,6 +166,9 @@ export default function Dashboard() {
   const handleSubmit = async () => {
     try {
       setSloader(true);
+
+      setTestcaseStatus(testcaseStatus.map(() => "loading"));
+
       const resp = await api.post(
         `/questions/submitCode/${questionData.id}`,
         {
@@ -165,19 +178,30 @@ export default function Dashboard() {
         }
       );
 
-      toast.success("Code submitted successfully!");
-      setSubmissionOutput(resp.data.results); // <-- SAVE test case summary
+      setSubmissionOutput(resp.data.results);
 
-    } catch (err) {
+      setTestcaseStatus(
+        resp.data.results.map((r: string) =>
+          r === "Accepted" ? "accepted" : "failed"
+        )
+      );
+
+      toast.success("Code submitted successfully!");
+    } catch (err: unknown) {
       console.error(err);
 
-      if (axios.isAxiosError(err)) {
-        if (err.response?.data?.results) {
-          setSubmissionOutput(err.response.data.results); // <-- Even on FAIL
-        }
-        toast.error(err?.response?.data?.message || "Submission failed");
+      if (axios.isAxiosError(err) && err.response?.data?.results) {
+        const results = err.response.data.results;
+
+        setSubmissionOutput(results);
+
+        setTestcaseStatus(
+          results.map((r: string) =>
+            r === "Accepted" ? "accepted" : "failed"
+          )
+        );
       } else {
-        toast.error("Submission failed, please try again");
+        toast.error("Submission failed!");
       }
     } finally {
       setSloader(false);
@@ -200,7 +224,7 @@ export default function Dashboard() {
   return (
     <PanelGroup direction="horizontal">
       <Panel defaultSize={40}>
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-800 bg-[#111]/90 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-[#111]/70">
+        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-neutral-800 bg-[#111]/90 px-4 py-3 backdrop-blur">
           <Button
             variant="ghost"
             className="h-9 gap-2 rounded-md border border-neutral-800 bg-neutral-900/50 px-3 text-neutral-200 hover:bg-neutral-800"
@@ -210,11 +234,11 @@ export default function Dashboard() {
           </Button>
           {questionData.title && (
             <div className="ml-1 flex items-center gap-2">
-              <h1 className="text-base font-semibold text-white md:text-lg line-clamp-1">
+              <h1 className="text-base font-semibold text-white md:text-lg">
                 {questionData.title}
               </h1>
               {questionData.done && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-green-900/60 px-2 py-0.5 text-[10px] font-medium text-green-200 ring-1 ring-inset ring-green-800">
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-900/60 px-2 py-0.5 text-[10px] font-medium text-green-200">
                   <CheckCircle2 className="h-3 w-3" /> Done
                 </span>
               )}
@@ -225,23 +249,21 @@ export default function Dashboard() {
         <div className="p-6 text-white overflow-y-auto h-[calc(100vh-48px)] bg-[#111]">
           {questionData.title ? (
             <>
-              <div className="mb-4">
-                <span
-                  className={`${
-                    questionData.difficulty === "Easy"
-                      ? "bg-green-900 text-green-200"
-                      : questionData.difficulty === "Medium"
-                      ? "bg-yellow-900 text-yellow-200"
-                      : "bg-red-900 text-red-200"
-                  } inline-flex rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ring-white/10`}
-                >
-                  {questionData.difficulty}
-                </span>
-              </div>
+              <span
+                className={`${
+                  questionData.difficulty === "Easy"
+                    ? "bg-green-900 text-green-200"
+                    : questionData.difficulty === "Medium"
+                    ? "bg-yellow-900 text-yellow-200"
+                    : "bg-red-900 text-red-200"
+                } inline-flex rounded-full px-3 py-1 text-xs font-medium`}
+              >
+                {questionData.difficulty}
+              </span>
 
-              <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4">
+              <div className="mt-4 rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4">
                 <h3 className="text-base font-semibold text-white">Description</h3>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-300">
+                <p className="mt-2 text-sm text-neutral-300">
                   {questionData.description}
                 </p>
               </div>
@@ -267,18 +289,16 @@ export default function Dashboard() {
                     <h3 className="text-sm font-semibold text-white">Sample Input</h3>
                     <Button
                       variant="ghost"
-                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200 hover:bg-neutral-700"
+                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200"
                       onClick={() => {
-                        navigator.clipboard.writeText(
-                          questionData.sample_input || ""
-                        );
+                        navigator.clipboard.writeText(questionData.sample_input || "");
                         toast.success("Sample input copied");
                       }}
                     >
                       Copy
                     </Button>
                   </div>
-                  <pre className="rounded-md bg-[#1a1a1a] p-3 text-xs text-neutral-200">
+                  <pre className="bg-[#1a1a1a] p-3 text-xs text-neutral-200 rounded-md">
                     {questionData.sample_input}
                   </pre>
                 </div>
@@ -288,36 +308,74 @@ export default function Dashboard() {
                     <h3 className="text-sm font-semibold text-white">Sample Output</h3>
                     <Button
                       variant="ghost"
-                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200 hover:bg-neutral-700"
+                      className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200"
                       onClick={() => {
-                        navigator.clipboard.writeText(
-                          questionData.sample_output || ""
-                        );
+                        navigator.clipboard.writeText(questionData.sample_output || "");
                         toast.success("Sample output copied");
                       }}
                     >
                       Copy
                     </Button>
                   </div>
-                  <pre className="rounded-md bg-[#1a1a1a] p-3 text-xs text-neutral-200">
+                  <pre className="bg-[#1a1a1a] p-3 text-xs text-neutral-200 rounded-md">
                     {questionData.sample_output}
                   </pre>
+                </div>
+              </div>
+
+              {/* ⭐ ALWAYS SHOWN TEST CASES */}
+              <div className="mt-6 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
+                <h3 className="text-base font-semibold text-white mb-3">Test Cases</h3>
+
+                <div className="space-y-2">
+                  {questionData.test_cases.map((testCase, index) => {
+                    const status = testcaseStatus[index];
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between border border-neutral-700 rounded-md p-3 bg-neutral-800/40"
+                      >
+                        <div>
+                          <p className="text-sm text-gray-300">
+                            Test Case {index + 1}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Input:{" "}
+                            {testCase.input.length > 15
+                              ? testCase.input.slice(0, 15) + "..."
+                              : testCase.input}
+                          </p>
+                        </div>
+
+                        {status === "pending" && (
+                          <span className="text-gray-500 text-sm">Pending</span>
+                        )}
+
+                        {status === "loading" && (
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent"></span>
+                        )}
+
+                        {status === "accepted" && (
+                          <span className="text-green-400 text-lg font-bold">✓</span>
+                        )}
+
+                        {status === "failed" && (
+                          <span className="text-red-400 text-lg font-bold">✗</span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </>
           ) : (
             <div className="space-y-4">
               <Skeleton className="h-8 w-3/4 bg-gray-700 rounded-md" />
-              <Skeleton className="h-5 w-24 bg-gray-700 rounded-full" />
+              <Skeleton className="h-5 w-24 bg-gray-700 rounded-md" />
               <Skeleton className="h-24 w-full bg-gray-700 rounded-md" />
               <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
               <Skeleton className="h-12 w-full bg-gray-700 rounded-md" />
-              <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
-              <Skeleton className="h-12 w-full bg-gray-700 rounded-md" />
-              <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
-              <Skeleton className="h-10 w-full bg-gray-700 rounded-md" />
-              <Skeleton className="h-6 w-40 bg-gray-700 rounded-md" />
-              <Skeleton className="h-10 w-full bg-gray-700 rounded-md" />
             </div>
           )}
         </div>
@@ -325,11 +383,13 @@ export default function Dashboard() {
 
       <PanelResizeHandle className="w-1 bg-gray-700" />
 
+      {/* RIGHT SIDE CODE + OUTPUT */}
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
           <Panel defaultSize={70}>
             <div className="flex flex-col h-full bg-[#0f0f0f]">
-              <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-700 gap-4">
+              <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-700">
+
                 <div className="flex items-center gap-3">
                   <Select
                     onValueChange={(value) => {
@@ -373,31 +433,17 @@ export default function Dashboard() {
                   <Button
                     onClick={handleRun}
                     disabled={rloader}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-70"
+                    className="bg-blue-600 text-white font-semibold disabled:opacity-70"
                   >
-                    {rloader ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
-                        Running
-                      </span>
-                    ) : (
-                      "Run"
-                    )}
+                    {rloader ? "Running..." : "Run"}
                   </Button>
 
                   <Button
                     onClick={handleSubmit}
                     disabled={sloader}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-70"
+                    className="bg-emerald-600 text-white font-semibold disabled:opacity-70"
                   >
-                    {sloader ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
-                        Submitting
-                      </span>
-                    ) : (
-                      "Submit"
-                    )}
+                    {sloader ? "Submitting..." : "Submit"}
                   </Button>
                 </div>
               </div>
@@ -420,92 +466,31 @@ export default function Dashboard() {
           <PanelResizeHandle className="h-1 bg-gray-700" />
 
           <Panel defaultSize={30}>
-            <div className="h-full bg-black border-t border-gray-700 flex flex-col">
-              <div className="p-3 border-b border-gray-700">
-                <div className="mb-1 flex items-center justify-between">
-                  <label className="text-gray-400">Custom Input</label>
-                  <Button
-                    variant="ghost"
-                    className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200 hover:bg-neutral-700"
-                    onClick={() => setCustomInput("")}
-                  >
-                    Clear
-                  </Button>
-                </div>
-                <textarea
-                  value={customInput}
-                  onChange={(e) => setCustomInput(e.target.value)}
-                  placeholder="Enter input..."
-                  className="w-full bg-[#1e1e1e] text-white p-2 rounded-lg resize-none"
-                  rows={3}
-                />
+            <div className="h-full bg-black text-white border-t border-gray-700 p-4 overflow-auto">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-gray-300">Output</h3>
+                <span className="text-[10px] bg-neutral-800 px-2 py-0.5 rounded-full">
+                  {output?.status?.description || "Idle"}
+                </span>
               </div>
 
-              <div className="flex-1 p-3 font-mono text-sm overflow-auto">
-                <div className="mb-1 flex items-center justify-between">
-                  <label className="text-gray-400">Output</label>
-                  <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[10px] text-neutral-300 ring-1 ring-inset ring-neutral-700">
-                    {output?.status?.description || "Idle"}
-                  </span>
+              <pre className="text-green-400 whitespace-pre-wrap">
+                {output.stdout || "Output will appear here..."}
+              </pre>
+
+              {output.stderr && (
+                <div className="mt-2 text-red-400">
+                  <h4>Stderr</h4>
+                  <pre>{output.stderr}</pre>
                 </div>
+              )}
 
-                <pre className="text-green-400 whitespace-pre-wrap">
-                  {output.stdout || "Output will appear here..."}
-                </pre>
-
-                {output.stderr && (
-                  <div className="mt-2">
-                    <div className="text-red-400">Stderr</div>
-                    <pre className="text-red-400 whitespace-pre-wrap">
-                      {output.stderr}
-                    </pre>
-                  </div>
-                )}
-
-                {output.compile_output && (
-                  <div className="mt-2">
-                    <div className="text-yellow-300">Compiler</div>
-                    <pre className="text-yellow-300 whitespace-pre-wrap">
-                      {output.compile_output}
-                    </pre>
-                  </div>
-                )}
-
-                {/* ⭐ TEST CASE RESULTS HERE ⭐ */}
-                {submissionOutput.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-gray-300 font-semibold mb-2">
-                      Test Case Results
-                    </h3>
-
-                    <div className="space-y-2">
-                      {submissionOutput.map((result, index) => {
-                        const isPass = result === "Accepted";
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between border border-neutral-700 rounded-md p-2 bg-neutral-900"
-                          >
-                            <span className="text-gray-300">
-                              Test Case {index + 1}
-                            </span>
-
-                            <span
-                              className={
-                                isPass
-                                  ? "text-green-400 font-semibold"
-                                  : "text-red-400 font-semibold"
-                              }
-                            >
-                              {result}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
+              {output.compile_output && (
+                <div className="mt-2 text-yellow-300">
+                  <h4>Compile Output</h4>
+                  <pre>{output.compile_output}</pre>
+                </div>
+              )}
             </div>
           </Panel>
         </PanelGroup>
