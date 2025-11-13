@@ -5,9 +5,27 @@ import { useRouter } from "next/navigation";
 import BlurText from "@/components/BlurText";
 import TextType from "@/components/TextType";
 import { BackgroundLines } from "@/components/ui/background-lines";
+import { useEffect } from "react";
+import api from "@/lib/axios";
 
 export default function BackgroundLinesDemo() {
   const router = useRouter();
+  
+  useEffect(() => {
+    (async() => {
+      try{
+        const response = await api.get("/");
+        if (response.status === 200) {
+          router.push("/dashboard/home");
+          return;
+        }
+        return;
+      }catch(err){
+        console.error("Error fetching data from backend: ", err);
+        return;
+      }
+    })();
+  } , []);
 
   return (
     <>

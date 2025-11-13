@@ -28,7 +28,11 @@ app.use('/api/userprofile', checkUserAuthentication, profile);
 
 
 app.get('/', (req, res) => {
-  res.send('Backend is running successfully on Vercel!');
+  const { token } = req.cookies;
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  return res.status(200).json({ message: 'Welcome back to VintiCode API.' });
 });
 
 

@@ -1,7 +1,10 @@
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const api = axios.create({
-    baseURL : "https://vinti-code.vercel.app/api" ,
+    baseURL : `${process.env.BACKEND_URL}`,
     withCredentials : true
 })
 
