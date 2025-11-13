@@ -14,7 +14,7 @@ question.post('/runCode/:id' , async (req , res) => {
     const randomInt = Math.floor(Math.random() * 5) + 1;
     const { code , language_id , input } = req.body;
     try {
-        const response = await api.post($`{process.env.JUDGE0_API}` , {
+        const response = await api.post(`${process.env.JUDGE0_API}` , {
             source_code : code,
             language_id : language_id,
             stdin : input ? input : ""
@@ -52,7 +52,7 @@ question.post('/submitCode/:id' , async (req , res) => {
         const testCases = questionData.test_cases
         const response = Promise.all(testCases.map( async (testCase) => {
             try{
-                const res = await api.post($`{process.env.JUDGE0_API}` , {
+                const res = await api.post(`${process.env.JUDGE0_API}` , {
                 source_code : code,
                 language_id : language_id,
                 stdin : testCase.input,
