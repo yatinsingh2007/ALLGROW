@@ -43,20 +43,18 @@ app.get('/', (req, res) => {
 module.exports = app;
 
 
-if (process.env.NODE_ENV !== 'production') {
-  async function main() {
-    try {
-      await prisma.$connect();
-      console.log('Connected to the database');
-      const PORT = process.env.PORT || 5000;
-      app.listen(PORT, () => {
-        console.log(`Server running locally on port ${PORT}`);
-      });
-    } catch (e) {
-      console.error(e);
-      await prisma.$disconnect();
-    }
+async function main() {
+  try {
+    await prisma.$connect();
+    console.log('Connected to the database');
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running locally on port ${PORT}`);
+    });
+  } catch (e) {
+    console.error(e);
+    await prisma.$disconnect();
   }
-
-  main();
 }
+
+main();
