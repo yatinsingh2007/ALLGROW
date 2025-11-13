@@ -92,10 +92,14 @@ function SidebarDemoInner() {
                       return (
                         <div
                           key={idx}
-                          onClick={() => {
-                            localStorage.removeItem("token");
-                            toast.success("Logged out successfully!");
-                            router.push("/");
+                          onClick={async (e) => {
+                            try{
+                              await api.get("/auth/logout");
+                              toast.success("Logged out successfully");
+                              router.push("/auth");
+                            }catch(err : unknown){
+                              toast.error("Logout failed");
+                            }
                           }}
                         >
                           <SidebarLink link={link} />
