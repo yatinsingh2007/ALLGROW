@@ -128,10 +128,7 @@ export default function Dashboard() {
     time: "",
     memory: 0,
     token: "",
-    status: {
-      id: 0,
-      description: "",
-    },
+    status: { id: 0, description: "" },
   });
   const [customInput, setCustomInput] = useState<string>("");
   const [code, setCode] = useState<string>("");
@@ -232,6 +229,7 @@ export default function Dashboard() {
           >
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
+
           {questionData.title && (
             <div className="ml-1 flex items-center gap-2">
               <h1 className="text-base font-semibold text-white md:text-lg">
@@ -291,7 +289,9 @@ export default function Dashboard() {
                       variant="ghost"
                       className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200"
                       onClick={() => {
-                        navigator.clipboard.writeText(questionData.sample_input || "");
+                        navigator.clipboard.writeText(
+                          questionData.sample_input || ""
+                        );
                         toast.success("Sample input copied");
                       }}
                     >
@@ -305,12 +305,16 @@ export default function Dashboard() {
 
                 <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
                   <div className="mb-2 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-white">Sample Output</h3>
+                    <h3 className="text-sm font-semibold text-white">
+                      Sample Output
+                    </h3>
                     <Button
                       variant="ghost"
                       className="h-8 rounded-md border border-neutral-800 bg-neutral-800/60 px-2 text-xs text-neutral-200"
                       onClick={() => {
-                        navigator.clipboard.writeText(questionData.sample_output || "");
+                        navigator.clipboard.writeText(
+                          questionData.sample_output || ""
+                        );
                         toast.success("Sample output copied");
                       }}
                     >
@@ -323,9 +327,10 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* ⭐ ALWAYS SHOWN TEST CASES */}
               <div className="mt-6 rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4">
-                <h3 className="text-base font-semibold text-white mb-3">Test Cases</h3>
+                <h3 className="text-base font-semibold text-white mb-3">
+                  Test Cases
+                </h3>
 
                 <div className="space-y-2">
                   {questionData.test_cases.map((testCase, index) => {
@@ -357,11 +362,15 @@ export default function Dashboard() {
                         )}
 
                         {status === "accepted" && (
-                          <span className="text-green-400 text-lg font-bold">✓</span>
+                          <span className="text-green-400 text-lg font-bold">
+                            ✓
+                          </span>
                         )}
 
                         {status === "failed" && (
-                          <span className="text-red-400 text-lg font-bold">✗</span>
+                          <span className="text-red-400 text-lg font-bold">
+                            ✗
+                          </span>
                         )}
                       </div>
                     );
@@ -383,13 +392,11 @@ export default function Dashboard() {
 
       <PanelResizeHandle className="w-1 bg-gray-700" />
 
-      {/* RIGHT SIDE CODE + OUTPUT */}
       <Panel defaultSize={60}>
         <PanelGroup direction="vertical">
           <Panel defaultSize={70}>
             <div className="flex flex-col h-full bg-[#0f0f0f]">
               <div className="flex items-center justify-between px-4 py-2 bg-[#1e1e1e] border-b border-gray-700">
-
                 <div className="flex items-center gap-3">
                   <Select
                     onValueChange={(value) => {
@@ -467,6 +474,18 @@ export default function Dashboard() {
 
           <Panel defaultSize={30}>
             <div className="h-full bg-black text-white border-t border-gray-700 p-4 overflow-auto">
+
+              {/* ⭐ Custom Input Box Restored */}
+              <div className="mb-3">
+                <h3 className="text-gray-300 mb-1">Custom Input</h3>
+                <textarea
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  className="w-full h-24 bg-[#1a1a1a] border border-gray-700 rounded-md p-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  placeholder="Enter custom input here..."
+                ></textarea>
+              </div>
+
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-gray-300">Output</h3>
                 <span className="text-[10px] bg-neutral-800 px-2 py-0.5 rounded-full">
