@@ -113,12 +113,14 @@ auth.post("/login", async (req, res) => {
 
 auth.get("/logout", checkUserAuthentication, async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("token" , {
       httpOnly: true,
       secure: true,
       sameSite: "none",
     });
-    return res.status(200).json({ message: "Logout successful" });
+    return res.status(200).json({
+      message: "Logout successful",
+    })
   } catch (err) {
     console.log(err);
     return res.status(500).json({
