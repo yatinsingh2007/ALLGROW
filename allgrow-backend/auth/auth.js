@@ -97,8 +97,8 @@ auth.post("/login", async (req, res) => {
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
@@ -113,17 +113,12 @@ auth.post("/login", async (req, res) => {
 
 auth.get("/logout", checkUserAuthentication, async (req, res) => {
   try {
-    return res
-      .cookie("token", null, {
-        expires: new Date(Date.now()),
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      })
-      .status(200)
-      .json({
-        message: "User LoggedOut Successfully",
-      });
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    return res.status(200).json({ message: "Logout successful" });
   } catch (err) {
     console.log(err);
     return res.status(500).json({
