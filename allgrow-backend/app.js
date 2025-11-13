@@ -13,7 +13,7 @@ const app = express();
 const FRONTEND_PORT = process.env.FRONTEND_PORT || 3000;
 
 app.use(cors({
-  origin: "https://vinticode.vercel.app",
+  origin: `${process.env.FRONTEND_URL}`,
   credentials: true
 }));
 
